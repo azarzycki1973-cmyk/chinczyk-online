@@ -41,7 +41,7 @@ function generateRoomId() {
 }
 
 io.on("connection", (socket) => {
-
+sendRoomsList();
     console.log("ONLINE:", socket.id.slice(0,6));
 
     // ===== CREATE ROOM =====
