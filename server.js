@@ -19,7 +19,20 @@ app.get("/", (req, res) => {
 });
 
 const rooms = {};
+function sendRoomsList() {
 
+    const publicRooms = [];
+
+    for (const roomId in rooms) {
+
+        publicRooms.push({
+            roomId,
+            count: rooms[roomId].players.length
+        });
+    }
+
+    io.emit("roomsList", publicRooms);
+}
 function generateRoomId() {
     return Math.random()
         .toString(36)
@@ -55,6 +68,7 @@ io.on("connection", (socket) => {
         });
 
         console.log("ROOM CREATED:", roomId);
+		sendRoomsList();
     });
 
     // ===== JOIN ROOM =====
@@ -92,6 +106,7 @@ io.on("connection", (socket) => {
             "JOINED",
             data.roomId
         );
+		sendRoomsList();
     });
 
     // ===== START GAME =====
@@ -129,7 +144,7 @@ io.on("connection", (socket) => {
             if (room.players.length === 0) {
 
                 delete rooms[roomId];
-
+                sendRoomsList();
                 console.log(
                     "ROOM REMOVED:",
                     roomId
