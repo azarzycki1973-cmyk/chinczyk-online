@@ -74,7 +74,9 @@ button:hover{
     <h1 id="roomTitle"></h1>
 
     <div id="playersList"></div>
+<h2>AKTYWNE POKOJE</h2>
 
+<div id="roomsList"></div>
     <button id="startBtn"
         onclick="startOnlineGame()">
         START
@@ -137,6 +139,16 @@ function joinRoom(){
         roomId
     });
 }
+function quickJoin(roomId){
+
+    const nick =
+        document.getElementById("nick").value || "Gracz";
+
+    socket.emit("joinRoom", {
+        nick,
+        roomId
+    });
+}
 
 function renderPlayers(players){
 
@@ -183,6 +195,41 @@ socket.on("roomCreated", data => {
 socket.on("roomUpdated", players => {
 
     renderPlayers(players);
+});
+socket.on("roomsList", rooms => {
+
+    const div =
+        document.getElementById("roomsList");
+
+    div.innerHTML = "";
+
+    rooms.forEach(room => {
+
+        div.innerHTML += `
+
+            <div style="
+                margin-top:10px;
+                padding:10px;
+                background:#111;
+                border-radius:10px;
+            ">
+
+                <b>${room.roomId}</b>
+                (${room.count}/4)
+
+                <button
+                    style="
+                        margin-top:8px;
+                        width:100%;
+                    "
+                    onclick="quickJoin('${room.roomId}')"
+                >
+                    DOŁĄCZ
+                </button>
+
+            </div>
+        `;
+    });
 });
 
 socket.on("joinError", msg => {
