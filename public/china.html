@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<title>Chińczyk</title>
+
+<style>
+html, body {
+    margin:0;
+    padding:0;
+    overflow:hidden;
+    background:black;
+    font-family: Arial;
+    color:white;
+}
+
+canvas {
+    display:block;
+}
+
+/* ===== PANEL ===== */
+#ui {
+    position:absolute;
+    right:20px;
+    top:20px;
+    width:170px;
+}
+
+input, select, button {
+    width:100%;
+    padding:10px;
+    margin-top:10px;
+    font-size:16px;
+    box-sizing:border-box;
+}
+
+button {
+    background:#444;
+    color:white;
+    border:none;
+    cursor:pointer;
+}
+
+#info {
+    margin-top:10px;
+    font-size:14px;
+}
+
+/* ===== KOSTKA ===== */
+#diceCanvas{
+    width:140px;
+    height:140px;
+    margin-top:10px;
+    background:black;
+    border-radius:12px;
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="game"></canvas>
+
+<div id="ui">
+
+    <select id="players" onchange="updateInputs()">
+        <option value="1">1 gracz</option>
+        <option value="2">2 graczy</option>
+        <option value="3">3 graczy</option>
+        <option value="4">4 graczy</option>
+    </select>
+
+    <div id="inputs"></div>
+
+    <button onclick="startGame()">
+        START
+    </button>
+
+    <button id="rollBtn"
+            onclick="rollDice()"
+            style="display:none;">
+        RZUCAJ
+    </button>
+
+    <div id="info"></div>
+
+    <canvas id="diceCanvas"></canvas>
+
+</div>
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+const socket = io();
+
+socket.on("connect", () => {
+    console.log("ONLINE:", socket.id);
+});
+
+socket.on("playerJoined", (id) => {
+    console.log("Dołączył:", id);
+});
+
+socket.on("playerLeft", (id) => {
+    console.log("Wyszedł:", id);
+});
+</script>
+<script src="china.js"></script>
+
+</body>
+</html>

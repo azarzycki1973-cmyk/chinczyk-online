@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+<meta charset="UTF-8">
+<title>Start</title>
+
+<style>
+
+body {
+    margin: 0;
+    background: #111;
+    color: white;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    height: 100vh;
+
+    font-family: Arial;
+}
+
+#menu {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+button {
+
+    padding: 20px 40px;
+    font-size: 24px;
+
+    background: #00c853;
+
+    border: none;
+    border-radius: 10px;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+
+    min-width: 320px;
+}
+
+button:hover {
+    background: #00e676;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="menu">
+
+    <button onclick="startWorld()">
+        🚀 Wejdź do gry
+    </button>
+
+    <button onclick="startChina()">
+        🎲 CHIŃCZYK
+    </button>
+
+</div>
+
+<script>
+
+function startWorld() {
+    window.location.href = "/world/";
+}
+
+function startChina() {
+    window.location.href = "/china.html";
+}
+
+</script>
+
+</body>
+</html>
