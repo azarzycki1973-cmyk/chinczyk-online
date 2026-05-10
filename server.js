@@ -5,32 +5,148 @@ const path = require("path");
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server);
+
+const io = new Server(server, {
+    cors: {
+        origin: "*"
+    }
+});
 
 app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/", (req, res) => {
-   res.sendFile(path.join(__dirname, "public", "china.html"));
+    res.sendFile(path.join(__dirname, "public", "china.html"));
 });
+
+const rooms = {};
+
+function generateRoomId() {
+    return Math.random()
+        .toString(36)
+        .substring(2, 7)
+        .toUpperCase();
+}
 
 io.on("connection", (socket) => {
 
-    console.log("Gracz połączony:", socket.id.slice(0,6));
+    console.log("ONLINE:", socket.id.slice(0,6));
 
-    socket.broadcast.emit("playerJoined", socket.id);
+    // ===== CREATE ROOM =====
+    socket.on("createRoom", (nick) => {
 
-    socket.on("disconnect", () => {
+        const roomId = generateRoomId();
 
-        console.log("Gracz rozłączony:", socket.id.slice(0,6));
+        rooms[roomId] = {
+            host: socket.id,
+            players: [
+                {
+                    id: socket.id,
+                    nick: nick,
+                    admin: true
+                }
+            ]
+        };
 
-        socket.broadcast.emit("playerLeft", socket.id);
+        socket.join(roomId);
+
+        socket.emit("roomCreated", {
+            roomId,
+            players: rooms[roomId].players
+        });
+
+        console.log("ROOM CREATED:", roomId);
     });
 
+    // ===== JOIN ROOM =====
+    socket.on("joinRoom", data => {
+
+        const room = rooms[data.roomId];
+
+        if (!room) {
+
+            socket.emit("joinError", "Pokój nie istnieje");
+            return;
+        }
+
+        if (room.players.length >= 4) {
+
+            socket.emit("joinError", "Pokój pełny");
+            return;
+        }
+
+        room.players.push({
+            id: socket.id,
+            nick: data.nick,
+            admin: false
+        });
+
+        socket.join(data.roomId);
+
+        io.to(data.roomId).emit(
+            "roomUpdated",
+            room.players
+        );
+
+        console.log(
+            data.nick,
+            "JOINED",
+            data.roomId
+        );
+    });
+
+    // ===== START GAME =====
+    socket.on("startGame", roomId => {
+
+        const room = rooms[roomId];
+
+        if (!room) return;
+
+        if (room.host !== socket.id) return;
+
+        io.to(roomId).emit(
+            "gameStarted",
+            room.players
+        );
+    });
+
+    // ===== DISCONNECT =====
+    socket.on("disconnect", () => {
+
+        for (const roomId in rooms) {
+
+            const room = rooms[roomId];
+
+            room.players =
+                room.players.filter(
+                    p => p.id !== socket.id
+                );
+
+            io.to(roomId).emit(
+                "roomUpdated",
+                room.players
+            );
+
+            if (room.players.length === 0) {
+
+                delete rooms[roomId];
+
+                console.log(
+                    "ROOM REMOVED:",
+                    roomId
+                );
+            }
+        }
+
+        console.log(
+            "OFFLINE:",
+            socket.id.slice(0,6)
+        );
+    });
 });
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
-server.listen(PORT, () => {
-    console.log("Serwer działa:");
-    console.log("http://localhost:" + PORT);
+server.listen(PORT, "0.0.0.0", () => {
+
+    console.log("SERVER START");
 });
