@@ -339,17 +339,40 @@ updateInputs();
 
 function startGame() {
 
-    const count = parseInt(document.getElementById("players").value);
+    // ===== START Z PANELU =====
+    if(players.length > 0){
+
+        document.getElementById("rollBtn")
+            .style.display = "block";
+
+        currentTurn = 0;
+        currentPlayer = players[0];
+
+        updateInfo(`
+            <b>${currentPlayer.nick}</b> zaczyna grę<br>
+            Kliknij RZUĆ
+        `);
+
+        if(currentPlayer.nick.startsWith("AI")){
+
+            aiThinking = true;
+            aiBlinkCount = 0;
+        }
+
+        return;
+    }
+
+    // ===== STARY TRYB =====
+    const count = parseInt(
+        document.getElementById("players").value
+    );
 
     players = [];
 
     for (let i = 0; i < count; i++) {
 
-        const nick =
-            document.getElementById("nick" + i).value || ("Gracz" + (i + 1));
-
         players.push({
-            nick,
+            nick: "Gracz" + (i + 1),
             color: COLORS[i]
         });
     }
@@ -364,21 +387,17 @@ function startGame() {
         });
     }
 
-    // ===== UKRYJ MENU =====
-    document.getElementById("players").style.display = "none";
-    document.getElementById("inputs").style.display = "none";
-    document.querySelector("button").style.display = "none";
-
-    // ===== POKAŻ RZUT =====
-    document.getElementById("rollBtn").style.display = "block";
+    document.getElementById("rollBtn")
+        .style.display = "block";
 
     currentTurn = 0;
     currentPlayer = players[0];
 
     updateInfo(`
-    <b>${currentPlayer.nick}</b> zaczyna grę<br>
-    Kliknij RZUĆ
-`);
+        <b>${currentPlayer.nick}</b> zaczyna grę<br>
+        Kliknij RZUĆ
+    `);
+}
 
 if(currentPlayer.nick.startsWith("CPU")){
 
