@@ -385,6 +385,7 @@ if(currentPlayer.nick.startsWith("CPU")){
     aiThinking = true;
     aiBlinkCount = 0;
 }
+}
 let currentTurn = 0;
 let currentPlayer = null;
 
