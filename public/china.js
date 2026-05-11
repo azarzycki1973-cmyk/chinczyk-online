@@ -298,7 +298,31 @@ function getPlayablePawns(color, dice) {
 
 // ===== GRACZE =====
 let players = [];
-const COLORS = ["RED","BLUE","GREEN","YELLOW"];
+
+const COLORS = [
+    "RED",
+    "BLUE",
+    "GREEN",
+    "YELLOW"
+];
+
+let gameMode = "offline";
+
+// ===== CONFIG =====
+const savedConfig =
+    localStorage.getItem("china_config");
+
+if(savedConfig){
+
+    const config =
+        JSON.parse(savedConfig);
+
+    gameMode =
+        config.mode || "offline";
+
+    players =
+        config.players || [];
+}
 
 function updateInputs() {
     const count = parseInt(document.getElementById("players").value);
