@@ -317,19 +317,28 @@ function startGame() {
 
     const count = parseInt(document.getElementById("players").value);
 
+  // ===== GRACZE Z MENU =====
+
+const savedPlayers =
+    localStorage.getItem("china_players");
+
+if(savedPlayers){
+
+    players =
+        JSON.parse(savedPlayers);
+
+}else{
+
     players = [];
 
     for (let i = 0; i < count; i++) {
 
-        const nick =
-            document.getElementById("nick" + i).value || ("Gracz" + (i + 1));
-
         players.push({
-            nick,
+            nick: "Gracz" + (i + 1),
             color: COLORS[i]
         });
     }
-
+}
     while (players.length < 4) {
 
         const color = COLORS[players.length];
