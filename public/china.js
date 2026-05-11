@@ -387,11 +387,11 @@ function rollDice() {
 }
 
     if (!currentPlayer) return;
-	if (
+if (
     !(
-    currentPlayer.nick.startsWith("AI") ||
-    currentPlayer.nick.startsWith("CPU")
-)
+        currentPlayer.nick.startsWith("AI") ||
+        currentPlayer.nick.startsWith("CPU")
+    ) &&
     aiThinking
 ) return;
     if (isAnimating) return;
