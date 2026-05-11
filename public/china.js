@@ -299,6 +299,23 @@ function getPlayablePawns(color, dice) {
 // ===== GRACZE =====
 let players = [];
 const COLORS = ["RED","BLUE","GREEN","YELLOW"];
+// ===== GRACZE ONLINE/OFFLINE =====
+
+const savedPlayers =
+    localStorage.getItem("china_players");
+
+if(savedPlayers){
+
+    try{
+
+        players =
+            JSON.parse(savedPlayers);
+
+    }catch(e){
+
+        players = [];
+    }
+}
 
 function updateInputs() {
     const count = parseInt(document.getElementById("players").value);
