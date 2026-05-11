@@ -113,20 +113,47 @@ sendRoomsList();
     });
 
     // ===== START GAME =====
-    socket.on("startGame", roomId => {
+socket.on("startGame", roomId => {
 
-        const room = rooms[roomId];
+    const room = rooms[roomId];
 
-        if (!room) return;
+    if (!room) return;
 
-        if (room.host !== socket.id) return;
+    if (room.host !== socket.id) return;
 
-        io.to(roomId).emit(
-            "gameStarted",
-            room.players
-        );
+    const COLORS = [
+        "RED",
+        "BLUE",
+        "GREEN",
+        "YELLOW"
+    ];
+
+    const onlinePlayers = [];
+
+    room.players.forEach((p, i) => {
+
+        onlinePlayers.push({
+            nick: p.nick,
+            color: COLORS[i]
+        });
     });
 
+    while (onlinePlayers.length < 4) {
+
+        const color =
+            COLORS[onlinePlayers.length];
+
+        onlinePlayers.push({
+            nick: "CPU " + color,
+            color
+        });
+    }
+
+    io.to(roomId).emit(
+        "gameStarted",
+        onlinePlayers
+    );
+});
     // ===== DISCONNECT =====
     socket.on("disconnect", () => {
 
