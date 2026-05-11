@@ -242,8 +242,44 @@ socket.on("joinError", msg => {
 
 function startOnlineGame(){
 
-    alert("START GRY");
+    socket.emit(
+        "startGame",
+        myRoom
+    );
 }
+socket.on("gameStarted", players => {
+
+    console.log("GAME START");
+
+    document.getElementById("menu")
+        .style.display = "none";
+
+    document.getElementById("roomBox")
+        .style.display = "none";
+
+    document.body.style.background =
+        "#202020";
+
+    const div =
+        document.createElement("div");
+
+    div.style.position = "absolute";
+    div.style.left = "50%";
+    div.style.top = "50%";
+    div.style.transform =
+        "translate(-50%, -50%)";
+
+    div.style.color = "white";
+    div.style.fontSize = "40px";
+
+    div.innerHTML =
+        "START GRY ONLINE<br><br>" +
+        players.map(p =>
+            p.nick + " - " + p.color
+        ).join("<br>");
+
+    document.body.appendChild(div);
+});
 
 </script>
 
