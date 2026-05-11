@@ -47,6 +47,7 @@ button:hover{
 
 #roomBox{
     position:absolute;
+	pointer-events:none;
     left:20px;
     top:20px;
     color:white;
@@ -60,6 +61,7 @@ button:hover{
 
 #startBtn{
     margin-top:15px;
+	pointer-events:auto;
     width:200px;
     display:none;
 }
@@ -76,7 +78,9 @@ button:hover{
     <div id="playersList"></div>
 <h2>AKTYWNE POKOJE</h2>
 
-<div id="roomsList"></div>
+<div id="roomsList"
+     style="pointer-events:auto">
+</div>
 <div style="color:lime;font-size:30px">
 ROOMS ACTIVE
 </div>
