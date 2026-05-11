@@ -314,7 +314,21 @@ window.updateInputs = updateInputs;
 updateInputs();
 
 function startGame() {
+if (players.length > 0) {
 
+    document.getElementById("rollBtn")
+        .style.display = "block";
+
+    currentTurn = 0;
+    currentPlayer = players[0];
+
+    updateInfo(`
+        Teraz rzuca:
+        <b>${players[0].nick}</b>
+    `);
+
+    return;
+}
     const count = parseInt(document.getElementById("players").value);
 
     players = [];
@@ -1012,4 +1026,7 @@ function loop() {
     requestAnimationFrame(loop);
 }
 
-loop();
+window.startRenderLoop = function(){
+
+    loop();
+}
