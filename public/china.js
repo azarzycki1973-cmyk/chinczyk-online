@@ -398,8 +398,12 @@ if (
     if (diceRolling) return;
     if (pendingDice !== null) return;
 
-    pendingDiceValue =
-        Math.floor(Math.random() * 6) + 1;
+    onlineSocket.emit(
+    "rollDice",
+    myRoom
+);
+
+return;
 
     diceRolling = true;
     diceStart = performance.now();
@@ -1054,3 +1058,13 @@ window.startRenderLoop = function(){
 
     loop();
 };
+onlineSocket.on(
+    "diceRolled",
+    value => {
+
+        pendingDiceValue = value;
+
+        diceRolling = true;
+        diceStart = performance.now();
+    }
+);

@@ -154,6 +154,17 @@ socket.on("startGame", roomId => {
         onlinePlayers
     );
 });
+    // ===== ONLINE DICE =====
+    socket.on("rollDice", roomId => {
+
+        const value =
+            Math.floor(Math.random() * 6) + 1;
+
+        io.to(roomId).emit(
+            "diceRolled",
+            value
+        );
+    });
     // ===== DISCONNECT =====
     socket.on("disconnect", () => {
 
