@@ -1052,21 +1052,5 @@ function loop() {
 
 window.startRenderLoop = function(){
 
-    function waitImages(){
-
-        if(
-            boardImg.complete &&
-            pawns.RED.complete &&
-            pawns.BLUE.complete &&
-            pawns.GREEN.complete &&
-            pawns.YELLOW.complete
-        ){
-            loop();
-        }
-        else{
-            requestAnimationFrame(waitImages);
-        }
-    }
-
-    waitImages();
-}
+    loop();
+};
