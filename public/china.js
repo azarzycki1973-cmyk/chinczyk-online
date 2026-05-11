@@ -388,7 +388,10 @@ function rollDice() {
 
     if (!currentPlayer) return;
 	if (
-    currentPlayer.nick.startsWith("AI") === false &&
+    !(
+    currentPlayer.nick.startsWith("AI") ||
+    currentPlayer.nick.startsWith("CPU")
+)
     aiThinking
 ) return;
     if (isAnimating) return;
@@ -689,12 +692,21 @@ function checkCapture(color, pawnIndex) {
 
 function nextPlayer() {
 
-    currentTurn = (currentTurn + 1) % players.length;
+    currentTurn =
+        (currentTurn + 1) % players.length;
 
-    currentPlayer = players[currentTurn];
+    currentPlayer =
+        players[currentTurn];
 
-    // ===== AI AUTO ROLL =====
-    if (currentPlayer.nick.startsWith("AI")) {
+    updateInfo(`
+        Teraz rzuca: <b>${currentPlayer.nick}</b>
+    `);
+
+    // ===== CPU AUTO =====
+    if (
+        currentPlayer.nick.startsWith("CPU") ||
+        currentPlayer.nick.startsWith("AI")
+    ) {
 
         aiThinking = true;
 
@@ -737,7 +749,10 @@ if (val === 6) {
         `);
 
         // ===== AI rzuca ponownie =====
-        if (currentPlayer.nick.startsWith("AI")) {
+        if (
+    currentPlayer.nick.startsWith("AI") ||
+    currentPlayer.nick.startsWith("CPU")
+) {
 
             aiThinking = true;
             aiBlinkCount = 0;
@@ -763,7 +778,10 @@ if (val === 6) {
     }
 
    // ===== CZŁOWIEK =====
-if (!currentPlayer.nick.startsWith("AI")) {
+if (
+    !currentPlayer.nick.startsWith("AI") &&
+    !currentPlayer.nick.startsWith("CPU")
+) {
 
     pendingDice = val;
     selectablePawns = playable;
@@ -1011,7 +1029,7 @@ function loop() {
             aiBlinkCount++;
 
             // 5 mignięć
-            if (aiBlinkCount >= 4) {
+            if (aiBlinkCount >= 2) {
 
                 aiThinking = false;
 
