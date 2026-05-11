@@ -380,7 +380,10 @@ function updateInfo(text) {
 // ===== KOSTKA =====
 function rollDice() {
 	if(
-    !currentPlayer.nick.startsWith("AI") &&
+    !(
+        currentPlayer.nick.startsWith("AI") ||
+        currentPlayer.nick.startsWith("CPU")
+    ) &&
     currentPlayer.nick !== myNick
 ){
     return;
@@ -398,7 +401,20 @@ if (
     if (diceRolling) return;
     if (pendingDice !== null) return;
 
-    onlineSocket.emit(
+if (
+    currentPlayer.nick.startsWith("CPU") ||
+    currentPlayer.nick.startsWith("AI")
+) {
+
+    pendingDiceValue =
+        Math.floor(Math.random() * 6) + 1;
+
+    diceRolling = true;
+    diceStart = performance.now();
+
+    return;
+}
+onlineSocket.emit(
     "rollDice",
     myRoom
 );
