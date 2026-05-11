@@ -298,31 +298,7 @@ function getPlayablePawns(color, dice) {
 
 // ===== GRACZE =====
 let players = [];
-
-const COLORS = [
-    "RED",
-    "BLUE",
-    "GREEN",
-    "YELLOW"
-];
-
-let gameMode = "offline";
-
-// ===== CONFIG =====
-const savedConfig =
-    localStorage.getItem("china_config");
-
-if(savedConfig){
-
-    const config =
-        JSON.parse(savedConfig);
-
-    gameMode =
-        config.mode || "offline";
-
-    players =
-        config.players || [];
-}
+const COLORS = ["RED","BLUE","GREEN","YELLOW"];
 
 function updateInputs() {
     const count = parseInt(document.getElementById("players").value);
@@ -339,40 +315,17 @@ updateInputs();
 
 function startGame() {
 
-    // ===== START Z PANELU =====
-    if(players.length > 0){
-
-        document.getElementById("rollBtn")
-            .style.display = "block";
-
-        currentTurn = 0;
-        currentPlayer = players[0];
-
-        updateInfo(`
-            <b>${currentPlayer.nick}</b> zaczyna grę<br>
-            Kliknij RZUĆ
-        `);
-
-        if(currentPlayer.nick.startsWith("AI")){
-
-            aiThinking = true;
-            aiBlinkCount = 0;
-        }
-
-        return;
-    }
-
-    // ===== STARY TRYB =====
-    const count = parseInt(
-        document.getElementById("players").value
-    );
+    const count = parseInt(document.getElementById("players").value);
 
     players = [];
 
     for (let i = 0; i < count; i++) {
 
+        const nick =
+            document.getElementById("nick" + i).value || ("Gracz" + (i + 1));
+
         players.push({
-            nick: "Gracz" + (i + 1),
+            nick,
             color: COLORS[i]
         });
     }
@@ -387,24 +340,20 @@ function startGame() {
         });
     }
 
-    document.getElementById("rollBtn")
-        .style.display = "block";
+    // ===== UKRYJ MENU =====
+    document.getElementById("players").style.display = "none";
+    document.getElementById("inputs").style.display = "none";
+    document.querySelector("button").style.display = "none";
+
+    // ===== POKAŻ RZUT =====
+    document.getElementById("rollBtn").style.display = "block";
 
     currentTurn = 0;
     currentPlayer = players[0];
 
-    updateInfo(`
-        <b>${currentPlayer.nick}</b> zaczyna grę<br>
-        Kliknij RZUĆ
-    `);
+    updateInfo(`Teraz rzuca: <b>${players[0].nick}</b>`);
 }
-
-if(currentPlayer.nick.startsWith("CPU")){
-
-    aiThinking = true;
-    aiBlinkCount = 0;
-}
-
+// ===== TURY =====
 let currentTurn = 0;
 let currentPlayer = null;
 
@@ -746,16 +695,10 @@ function handleMove(val) {
         nextPlayer();
 
         updateInfo(`
-    <b>${currentPlayer.nick}</b> zaczyna grę<br>
-    Kliknij RZUĆ
-`);
-
-// ===== AI START =====
-if(currentPlayer.nick.startsWith("CPU")){
-
-    aiThinking = true;
-    aiBlinkCount = 0;
-}
+            <b>${playerName}</b> wyrzucił: <b>${val}</b><br>
+            Musisz wyrzucić 6 aby wyjść<br>
+            Teraz rzuca: <b>${currentPlayer.nick}</b>
+        `);
 
         return;
     }
@@ -1070,4 +1013,3 @@ function loop() {
 }
 
 loop();
-startGame();
