@@ -298,11 +298,28 @@ socket.on("gameStarted", onlinePlayers => {
 
     console.log("GAME START");
 
-    document.getElementById("menu")
-        .style.display = "none";
+    const menu =
+        document.getElementById("menu");
 
-    document.getElementById("roomBox")
-        .style.display = "none";
+    const roomBox =
+        document.getElementById("roomBox");
+
+    if (menu) {
+        menu.style.display = "none";
+    }
+
+    if (roomBox) {
+        roomBox.style.display = "none";
+    }
+
+    const game =
+        document.getElementById("game");
+
+    const dice =
+        document.getElementById("diceCanvas");
+
+    game.style.display = "block";
+    dice.style.display = "block";
 
     players = [];
 
@@ -314,8 +331,8 @@ socket.on("gameStarted", onlinePlayers => {
         });
     });
 
-    currentPlayer = players[0];
     currentTurn = 0;
+    currentPlayer = players[0];
 
     startGame();
 });
