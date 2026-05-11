@@ -2,6 +2,7 @@
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Chińczyk Online</title>
 
 <style>
@@ -13,57 +14,52 @@ body{
     font-family:Arial;
 }
 
-#menu{
+#game{
+    position:absolute;
+    left:0;
+    top:0;
+}
+
+#info{
+    position:absolute;
+    left:50%;
+    top:20px;
+    transform:translateX(-50%);
+    color:white;
+    font-size:30px;
+    z-index:10;
+    text-align:center;
+}
+
+#rollBtn{
     position:absolute;
     right:40px;
-    top:180px;
-    width:320px;
-    display:flex;
-    flex-direction:column;
-    gap:14px;
-}
-
-input{
-    height:60px;
+    bottom:200px;
+    width:160px;
+    height:70px;
     border:none;
-    border-radius:12px;
-    padding-left:18px;
-    font-size:22px;
-}
-
-button{
-    height:60px;
-    border:none;
-    border-radius:12px;
-    font-size:22px;
-    background:#5f5f5f;
+    border-radius:14px;
+    background:#666;
     color:white;
+    font-size:28px;
     cursor:pointer;
-}
-
-button:hover{
-    background:#777;
-}
-
-#roomBox{
-    position:absolute;
-	
-    left:20px;
-    top:20px;
-    color:white;
+    z-index:10;
     display:block;
 }
 
-#playersList{
-    margin-top:10px;
-    font-size:22px;
+#rollBtn:hover{
+    background:#888;
 }
 
-#startBtn{
-    margin-top:15px;
-	
-    width:200px;
-    display:none;
+#diceCanvas{
+    position:absolute;
+    right:40px;
+    bottom:40px;
+    width:140px;
+    height:140px;
+    background:black;
+    border-radius:12px;
+    z-index:10;
 }
 
 </style>
@@ -71,321 +67,25 @@ button:hover{
 
 <body>
 
-<div id="roomBox">
-
-    <h1 id="roomTitle"></h1>
-
-    <div id="playersList"></div>
-<h2>AKTYWNE POKOJE</h2>
-
-<div id="roomsList"
-     style="pointer-events:auto">
-</div>
-<div style="color:lime;font-size:30px">
-ROOMS ACTIVE
-</div>
-    <button id="startBtn"
-        onclick="startOnlineGame()">
-        START
-    </button>
-
-</div>
-
-<div id="menu">
-
-    <input
-        id="nick"
-        placeholder="Twój nick"
-        value="Gacek"
-    >
-
-    <button onclick="createRoom()">
-        ZAŁÓŻ POKÓJ
-    </button>
-
-    <input
-        id="roomInput"
-        placeholder="Kod pokoju"
-    >
-
-    <button onclick="joinRoom()">
-        DOŁĄCZ DO POKOJU
-    </button>
-
-</div>
 <canvas id="game"></canvas>
 
-<canvas id="diceCanvas"
-style="
-position:absolute;
-right:40px;
-bottom:40px;
-background:black;
-border-radius:12px;
-">
-</canvas>
+<div id="info"></div>
 
-<div id="info"
-style="
-position:absolute;
-left:50%;
-top:20px;
-transform:translateX(-50%);
-color:white;
-font-size:28px;
-z-index:10;
-">
-</div>
-
-<button id="rollBtn"
-onclick="rollDice()"
-style="
-position:absolute;
-right:40px;
-bottom:200px;
-width:140px;
-display:none;
-z-index:10;
-">
-RZUĆ
-</button>
-
-<select id="players" style="display:none">
-<option>2</option>
-<option>3</option>
-<option selected>4</option>
-</select>
-
-<div id="inputs" style="display:none"></div>
-<script src="/socket.io/socket.io.js"></script>
-
-<script>
-
-const socket = io();
-
-let myRoom = null;
-let isAdmin = false;
-
-function createRoom(){
-myNick =
-    document.getElementById("nick").value;
-    const nick =
-        document.getElementById("nick").value;
-
-    socket.emit("createRoom", nick);
-}
-
-function joinRoom(){
-myNick =
-    document.getElementById("nick").value;
-    const nick =
-        document.getElementById("nick").value;
-
-    const roomId =
-        document.getElementById("roomInput")
-        .value
-        .toUpperCase();
-
-    socket.emit("joinRoom", {
-        nick,
-        roomId
-    });
-}
-function quickJoin(roomId){
-
-    const nick =
-        document.getElementById("nick").value || "Gracz";
-
-    socket.emit("joinRoom", {
-        nick,
-        roomId
-    });
-}
-
-function renderPlayers(players){
-
-    const list =
-        document.getElementById("playersList");
-
-    list.innerHTML = "";
-
-    players.forEach(p => {
-
-        list.innerHTML += `
-            <div>
-                ${p.nick}
-                ${p.admin ? " ⭐" : ""}
-            </div>
-        `;
-    });
-}
-
-socket.on("connect", () => {
-
-    console.log("SOCKET OK");
-});
-
-socket.on("roomCreated", data => {
-
-    myRoom = data.roomId;
-
-    isAdmin = true;
-
-    document.getElementById("roomBox")
-        .style.display = "block";
-
-    document.getElementById("roomTitle")
-        .innerHTML =
-        "POKÓJ: " + data.roomId;
-
-    document.getElementById("startBtn")
-        .style.display = "block";
-
-    renderPlayers(data.players);
-});
-
-socket.on("roomUpdated", players => {
-
-    renderPlayers(players);
-});
-socket.on("roomsList", rooms => {
-
-    const div =
-        document.getElementById("roomsList");
-
-    div.innerHTML = "";
-
-    rooms.forEach(room => {
-
-        div.innerHTML += `
-
-            <div style="
-                margin-top:10px;
-                padding:10px;
-                background:#111;
-                border-radius:10px;
-            ">
-
-                <b>${room.roomId}</b>
-                (${room.count}/4)
-
-                <button
-                    style="
-                        margin-top:8px;
-                        width:100%;
-                    "
-                    onclick="quickJoin('${room.roomId}')"
-                >
-                    DOŁĄCZ
-                </button>
-
-            </div>
-        `;
-    });
-});
-
-socket.on("joinError", msg => {
-
-    alert(msg);
-});
-
-function startOnlineGame(){
-
-    socket.emit(
-        "startGame",
-        myRoom
-    );
-}
-socket.on("gameStarted", onlinePlayers => {
-
-    console.log("GAME START");
-
-    const menu =
-        document.getElementById("menu");
-
-    const roomBox =
-        document.getElementById("roomBox");
-
-    if (menu) {
-        menu.style.display = "none";
-    }
-
-    if (roomBox) {
-        roomBox.style.display = "none";
-    }
-
-    const game =
-        document.getElementById("game");
-
-    const dice =
-        document.getElementById("diceCanvas");
-
-    game.style.display = "block";
-    dice.style.display = "block";
-
-    players = [];
-
-    onlinePlayers.forEach(p => {
-
-        players.push({
-            nick: p.nick,
-            color: p.color
-        });
-    });
-
-    currentTurn = 0;
-    currentPlayer = players[0];
-
-    startGame();
-    startRenderLoop();
-});
-
-</script>
-<canvas id="game"></canvas>
-
-<div id="info"
-     style="
-        position:absolute;
-        top:20px;
-        left:50%;
-        transform:translateX(-50%);
-        color:white;
-        font-size:36px;
-        z-index:5;
-     ">
-</div>
-
-<button id="rollBtn"
-    onclick="rollDice()"
-    style="
-        position:absolute;
-        right:30px;
-        bottom:120px;
-        width:170px;
-        height:70px;
-        font-size:26px;
-        border:none;
-        border-radius:14px;
-        background:#666;
-        color:white;
-        z-index:10;
-        display:none;
-    ">
+<button id="rollBtn" onclick="rollDice()">
     RZUĆ
 </button>
 
-<canvas id="diceCanvas"
-    style="
-        position:absolute;
-        right:40px;
-        bottom:20px;
-        width:120px;
-        height:120px;
-        z-index:10;
-    ">
-</canvas>
+<canvas id="diceCanvas"></canvas>
+
+<select id="players" style="display:none">
+    <option>2</option>
+    <option>3</option>
+    <option selected>4</option>
+</select>
+
+<div id="inputs" style="display:none"></div>
+
 <script src="china.js"></script>
+
 </body>
-
-
 </html>
