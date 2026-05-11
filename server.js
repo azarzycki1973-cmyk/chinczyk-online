@@ -14,7 +14,7 @@ const io = new Server(server, {
 
 app.use(express.static(path.join(__dirname, "public")));
 app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "china.html"));
+    res.sendFile(path.join(__dirname, "public", "china_panel.html"));
 });
 
 app.get("/china.html", (req, res) => {

@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chińczyk Online - Panel</title>
+
+<style>
+
+body{
+    margin:0;
+    background:black;
+    color:white;
+    font-family:Arial;
+    overflow:hidden;
+}
+
+#main{
+    width:100vw;
+    height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:40px;
+}
+
+.panel{
+    width:420px;
+    background:#111;
+    border-radius:20px;
+    padding:25px;
+    box-sizing:border-box;
+    border:2px solid #333;
+}
+
+h1{
+    margin-top:0;
+    text-align:center;
+    font-size:38px;
+}
+
+h2{
+    margin-top:0;
+}
+
+input,
+select,
+button{
+    width:100%;
+    height:58px;
+    border:none;
+    border-radius:12px;
+    margin-top:12px;
+    font-size:22px;
+    box-sizing:border-box;
+}
+
+input,
+select{
+    padding-left:15px;
+    background:#222;
+    color:white;
+}
+
+button{
+    background:#5a5a5a;
+    color:white;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+button:hover{
+    background:#777;
+}
+
+.room{
+    margin-top:12px;
+    background:#1b1b1b;
+    border-radius:12px;
+    padding:12px;
+}
+
+.roomTitle{
+    font-size:24px;
+    font-weight:bold;
+}
+
+.roomCount{
+    margin-top:5px;
+    color:#aaa;
+}
+
+#roomLobby{
+    display:none;
+}
+
+.playerLine{
+    margin-top:10px;
+    padding:10px;
+    background:#1d1d1d;
+    border-radius:10px;
+    font-size:22px;
+}
+
+.admin{
+    color:gold;
+}
+
+#status{
+    margin-top:15px;
+    color:lime;
+    font-size:20px;
+    text-align:center;
+}
+
+</style>
+
+</head>
+<body>
+
+<div id="main">
+
+```
+<div class="panel">
+
+    <h1>OFFLINE</h1>
+
+    <input
+        id="offlineNick"
+        placeholder="Twój nick"
+        value="Arek"
+    >
+
+    <select id="offlinePlayers">
+        <option value="1">1 gracz + 3 CPU</option>
+        <option value="2">2 graczy + 2 CPU</option>
+        <option value="3">3 graczy + 1 CPU</option>
+        <option value="4">4 graczy</option>
+    </select>
+
+    <button onclick="startOfflineGame()">
+        START OFFLINE
+    </button>
+
+</div>
+
+<div class="panel">
+
+    <h1>ONLINE</h1>
+
+    <div id="onlineMenu">
+
+        <input
+            id="onlineNick"
+            placeholder="Twój nick"
+            value="Gacek"
+        >
+
+        <button onclick="createRoom()">
+            ZAŁÓŻ POKÓJ
+        </button>
+
+        <input
+            id="roomInput"
+            placeholder="Kod pokoju"
+        >
+
+        <button onclick="joinRoom()">
+            DOŁĄCZ
+        </button>
+
+        <div id="status"></div>
+
+        <h2 style="margin-top:25px">
+            AKTYWNE POKOJE
+        </h2>
+
+        <div id="roomsList"></div>
+
+    </div>
+
+    <div id="roomLobby">
+
+        <h2 id="roomTitle"></h2>
+
+        <div id="playersList"></div>
+
+        <button
+            id="startBtn"
+            onclick="startOnlineGame()"
+            style="display:none"
+        >
+            START GRY
+        </button>
+
+    </div>
+
+</div>
+```
+
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+
+const socket = io();
+
+let myRoom = null;
+let isAdmin = false;
+
+function startOfflineGame(){
+
+    const nick =
+        document.getElementById("offlineNick")
+        .value || "Gracz";
+
+    const playerCount = parseInt(
+        document.getElementById("offlinePlayers")
+        .value
+    );
+
+    const COLORS = [
+        "RED",
+        "BLUE",
+        "GREEN",
+        "YELLOW"
+    ];
+
+    const players = [];
+
+    players.push({
+        nick,
+        color:"RED",
+        ai:false
+    });
+
+    for(let i = 1; i < playerCount; i++){
+
+        players.push({
+            nick:"Gracz " + (i + 1),
+            color:COLORS[i],
+            ai:false
+        });
+    }
+
+    while(players.length < 4){
+
+        const color = COLORS[players.length];
+
+        players.push({
+            nick:"CPU " + color,
+            color,
+            ai:true
+        });
+    }
+
+    localStorage.setItem(
+        "china_config",
+        JSON.stringify({
+            mode:"offline",
+            players
+        })
+    );
+
+    location.href = "china.html";
+}
+
+function createRoom(){
+
+    const nick =
+        document.getElementById("onlineNick")
+        .value || "Gracz";
+
+    socket.emit("createRoom", nick);
+}
+
+function joinRoom(){
+
+    const nick =
+        document.getElementById("onlineNick")
+        .value || "Gracz";
+
+    const roomId =
+        document.getElementById("roomInput")
+        .value
+        .toUpperCase();
+
+    socket.emit("joinRoom", {
+        nick,
+        roomId
+    });
+}
+
+function quickJoin(roomId){
+
+    const nick =
+        document.getElementById("onlineNick")
+        .value || "Gracz";
+
+    socket.emit("joinRoom", {
+        nick,
+        roomId
+    });
+}
+
+function renderPlayers(players){
+
+    const list =
+        document.getElementById("playersList");
+
+    list.innerHTML = "";
+
+    players.forEach(p => {
+
+        list.innerHTML += `
+            <div class="playerLine">
+                ${p.nick}
+                ${p.admin ? '<span class="admin"> ⭐</span>' : ''}
+            </div>
+        `;
+    });
+}
+
+socket.on("roomCreated", data => {
+
+    myRoom = data.roomId;
+    isAdmin = true;
+
+    document.getElementById("onlineMenu")
+        .style.display = "none";
+
+    document.getElementById("roomLobby")
+        .style.display = "block";
+
+    document.getElementById("roomTitle")
+        .innerHTML = "POKÓJ: " + data.roomId;
+
+    document.getElementById("startBtn")
+        .style.display = "block";
+
+    renderPlayers(data.players);
+});
+
+socket.on("roomUpdated", players => {
+
+    document.getElementById("roomLobby")
+        .style.display = "block";
+
+    document.getElementById("onlineMenu")
+        .style.display = "none";
+
+    renderPlayers(players);
+});
+
+socket.on("roomsList", rooms => {
+
+    const div =
+        document.getElementById("roomsList");
+
+    div.innerHTML = "";
+
+    rooms.forEach(room => {
+
+        div.innerHTML += `
+
+            <div class="room">
+
+                <div class="roomTitle">
+                    ${room.roomId}
+                </div>
+
+                <div class="roomCount">
+                    GRACZE: ${room.count}/4
+                </div>
+
+                <button
+                    onclick="quickJoin('${room.roomId}')"
+                >
+                    DOŁĄCZ
+                </button>
+
+            </div>
+        `;
+    });
+});
+
+socket.on("joinError", msg => {
+
+    document.getElementById("status")
+        .innerHTML = msg;
+});
+
+function startOnlineGame(){
+
+    socket.emit(
+        "startGame",
+        myRoom
+    );
+}
+
+socket.on("gameStarted", onlinePlayers => {
+
+    localStorage.setItem(
+        "china_config",
+        JSON.stringify({
+            mode:"online",
+            roomId:myRoom,
+            players:onlinePlayers
+        })
+    );
+
+    location.href = "china.html";
+});
+
+</script>
+
+</body>
+</html>

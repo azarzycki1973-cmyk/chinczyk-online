@@ -314,21 +314,7 @@ window.updateInputs = updateInputs;
 updateInputs();
 
 function startGame() {
-if (players.length > 0) {
 
-    document.getElementById("rollBtn")
-        .style.display = "block";
-
-    currentTurn = 0;
-    currentPlayer = players[0];
-
-    updateInfo(`
-        Teraz rzuca:
-        <b>${players[0].nick}</b>
-    `);
-
-    return;
-}
     const count = parseInt(document.getElementById("players").value);
 
     players = [];
@@ -379,47 +365,18 @@ function updateInfo(text) {
 
 // ===== KOSTKA =====
 function rollDice() {
-	if(
-    !(
-        currentPlayer.nick.startsWith("AI") ||
-        currentPlayer.nick.startsWith("CPU")
-    ) &&
-    currentPlayer.nick !== myNick
-){
-    return;
-}
 
     if (!currentPlayer) return;
-if (
-    !(
-        currentPlayer.nick.startsWith("AI") ||
-        currentPlayer.nick.startsWith("CPU")
-    ) &&
+	if (
+    currentPlayer.nick.startsWith("AI") === false &&
     aiThinking
 ) return;
     if (isAnimating) return;
     if (diceRolling) return;
     if (pendingDice !== null) return;
 
-if (
-    currentPlayer.nick.startsWith("CPU") ||
-    currentPlayer.nick.startsWith("AI")
-) {
-
     pendingDiceValue =
         Math.floor(Math.random() * 6) + 1;
-
-    diceRolling = true;
-    diceStart = performance.now();
-
-    return;
-}
-onlineSocket.emit(
-    "rollDice",
-    myRoom
-);
-
-return;
 
     diceRolling = true;
     diceStart = performance.now();
@@ -712,21 +669,12 @@ function checkCapture(color, pawnIndex) {
 
 function nextPlayer() {
 
-    currentTurn =
-        (currentTurn + 1) % players.length;
+    currentTurn = (currentTurn + 1) % players.length;
 
-    currentPlayer =
-        players[currentTurn];
+    currentPlayer = players[currentTurn];
 
-    updateInfo(`
-        Teraz rzuca: <b>${currentPlayer.nick}</b>
-    `);
-
-    // ===== CPU AUTO =====
-    if (
-        currentPlayer.nick.startsWith("CPU") ||
-        currentPlayer.nick.startsWith("AI")
-    ) {
+    // ===== AI AUTO ROLL =====
+    if (currentPlayer.nick.startsWith("AI")) {
 
         aiThinking = true;
 
@@ -769,10 +717,7 @@ if (val === 6) {
         `);
 
         // ===== AI rzuca ponownie =====
-        if (
-    currentPlayer.nick.startsWith("AI") ||
-    currentPlayer.nick.startsWith("CPU")
-) {
+        if (currentPlayer.nick.startsWith("AI")) {
 
             aiThinking = true;
             aiBlinkCount = 0;
@@ -798,10 +743,7 @@ if (val === 6) {
     }
 
    // ===== CZŁOWIEK =====
-if (
-    !currentPlayer.nick.startsWith("AI") &&
-    !currentPlayer.nick.startsWith("CPU")
-) {
+if (!currentPlayer.nick.startsWith("AI")) {
 
     pendingDice = val;
     selectablePawns = playable;
@@ -1049,7 +991,7 @@ function loop() {
             aiBlinkCount++;
 
             // 5 mignięć
-            if (aiBlinkCount >= 2) {
+            if (aiBlinkCount >= 4) {
 
                 aiThinking = false;
 
@@ -1070,17 +1012,4 @@ function loop() {
     requestAnimationFrame(loop);
 }
 
-window.startRenderLoop = function(){
-
-    loop();
-};
-onlineSocket.on(
-    "diceRolled",
-    value => {
-
-        pendingDiceValue = value;
-
-        diceRolling = true;
-        diceStart = performance.now();
-    }
-);
+loop();
