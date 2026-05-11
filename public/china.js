@@ -379,6 +379,12 @@ function updateInfo(text) {
 
 // ===== KOSTKA =====
 function rollDice() {
+	if(
+    !currentPlayer.nick.startsWith("AI") &&
+    currentPlayer.nick !== myNick
+){
+    return;
+}
 
     if (!currentPlayer) return;
 	if (
