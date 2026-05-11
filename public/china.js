@@ -375,9 +375,16 @@ function startGame() {
     currentTurn = 0;
     currentPlayer = players[0];
 
-    updateInfo(`Teraz rzuca: <b>${players[0].nick}</b>`);
+    updateInfo(`
+    <b>${currentPlayer.nick}</b> zaczyna grę<br>
+    Kliknij RZUĆ
+`);
+
+if(currentPlayer.nick.startsWith("CPU")){
+
+    aiThinking = true;
+    aiBlinkCount = 0;
 }
-// ===== TURY =====
 let currentTurn = 0;
 let currentPlayer = null;
 
@@ -719,10 +726,16 @@ function handleMove(val) {
         nextPlayer();
 
         updateInfo(`
-            <b>${playerName}</b> wyrzucił: <b>${val}</b><br>
-            Musisz wyrzucić 6 aby wyjść<br>
-            Teraz rzuca: <b>${currentPlayer.nick}</b>
-        `);
+    <b>${currentPlayer.nick}</b> zaczyna grę<br>
+    Kliknij RZUĆ
+`);
+
+// ===== AI START =====
+if(currentPlayer.nick.startsWith("CPU")){
+
+    aiThinking = true;
+    aiBlinkCount = 0;
+}
 
         return;
     }
@@ -1037,3 +1050,4 @@ function loop() {
 }
 
 loop();
+startGame();
