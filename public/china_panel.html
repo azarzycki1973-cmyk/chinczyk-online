@@ -211,7 +211,10 @@ let myRoom = null;
 let isAdmin = false;
 
 function startOfflineGame(){
-
+localStorage.setItem(
+    "china_mode",
+    "offline"
+);
     const nick =
         document.getElementById("offlineNick")
         .value || "Gracz";
@@ -401,7 +404,10 @@ function startOnlineGame(){
 }
 
 socket.on("gameStarted", onlinePlayers => {
-
+localStorage.setItem(
+    "china_mode",
+    "online"
+);
     localStorage.setItem(
         "china_config",
         JSON.stringify({
