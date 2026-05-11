@@ -335,9 +335,53 @@ socket.on("gameStarted", onlinePlayers => {
     currentPlayer = players[0];
 
     startGame();
+startRenderLoop();
 });
 
 </script>
+<canvas id="game"></canvas>
+
+<div id="info"
+     style="
+        position:absolute;
+        top:20px;
+        left:50%;
+        transform:translateX(-50%);
+        color:white;
+        font-size:36px;
+        z-index:5;
+     ">
+</div>
+
+<button id="rollBtn"
+    onclick="rollDice()"
+    style="
+        position:absolute;
+        right:30px;
+        bottom:120px;
+        width:170px;
+        height:70px;
+        font-size:26px;
+        border:none;
+        border-radius:14px;
+        background:#666;
+        color:white;
+        z-index:10;
+        display:none;
+    ">
+    RZUĆ
+</button>
+
+<canvas id="diceCanvas"
+    style="
+        position:absolute;
+        right:40px;
+        bottom:20px;
+        width:120px;
+        height:120px;
+        z-index:10;
+    ">
+</canvas>
 <script src="china.js"></script>
 </body>
 
