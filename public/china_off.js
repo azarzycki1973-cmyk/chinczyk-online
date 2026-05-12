@@ -315,43 +315,63 @@ updateInputs();
 
 function startGame() {
 
-    const count = parseInt(document.getElementById("players").value);
+    const savedPlayers =
+        localStorage.getItem("china_players");
 
-    players = [];
+    if(savedPlayers){
 
-    for (let i = 0; i < count; i++) {
+        try{
 
-        const nick =
-            document.getElementById("nick" + i).value || ("Gracz" + (i + 1));
+            players =
+                JSON.parse(savedPlayers);
 
-        players.push({
-            nick,
-            color: COLORS[i]
-        });
+        }catch(e){
+
+            players = [];
+        }
     }
 
-    while (players.length < 4) {
+    // ===== AWARYJNIE =====
 
-        const color = COLORS[players.length];
+    if(players.length === 0){
 
-        players.push({
-            nick: `AI ${color}`,
-            color
-        });
+        players = [
+            {
+                nick:"Gracz1",
+                color:"RED"
+            },
+            {
+                nick:"AI BLUE",
+                color:"BLUE"
+            },
+            {
+                nick:"AI GREEN",
+                color:"GREEN"
+            },
+            {
+                nick:"AI YELLOW",
+                color:"YELLOW"
+            }
+        ];
     }
 
     // ===== UKRYJ MENU =====
-    document.getElementById("players").style.display = "none";
-    document.getElementById("inputs").style.display = "none";
-    document.querySelector("button").style.display = "none";
+
+    document.getElementById("menu")
+        .style.display = "none";
 
     // ===== POKAŻ RZUT =====
-    document.getElementById("rollBtn").style.display = "block";
+
+    document.getElementById("rollBtn")
+        .style.display = "block";
 
     currentTurn = 0;
+
     currentPlayer = players[0];
 
-    updateInfo(`Teraz rzuca: <b>${players[0].nick}</b>`);
+    updateInfo(
+        `Teraz rzuca: <b>${players[0].nick}</b>`
+    );
 }
 // ===== TURY =====
 let currentTurn = 0;
