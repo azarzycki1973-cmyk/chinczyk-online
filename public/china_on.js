@@ -321,29 +321,41 @@ window.updateInputs = updateInputs;
 updateInputs();
 
 function startGame() {
-if(
-    onlineConfig &&
-    onlineConfig.players
-){
-    players = onlineConfig.players;
-}
-    const savedPlayers =
-        localStorage.getItem("china_players");
 
-    if(savedPlayers){
+    // ===== ONLINE PLAYERS =====
 
-        try{
+    if(
+        onlineConfig &&
+        onlineConfig.players
+    ){
 
-            players =
-                JSON.parse(savedPlayers);
-
-        }catch(e){
-
-            players = [];
-        }
+        players = onlineConfig.players;
     }
 
     // ===== AWARYJNIE =====
+
+    if(players.length === 0){
+
+        const savedPlayers =
+            localStorage.getItem(
+                "china_players"
+            );
+
+        if(savedPlayers){
+
+            try{
+
+                players =
+                    JSON.parse(savedPlayers);
+
+            }catch(e){
+
+                players = [];
+            }
+        }
+    }
+
+    // ===== FINAL FALLBACK =====
 
     if(players.length === 0){
 
@@ -353,26 +365,30 @@ if(
                 color:"RED"
             },
             {
-                nick:"AI BLUE",
+                nick:"CPU BLUE",
                 color:"BLUE"
             },
             {
-                nick:"AI GREEN",
+                nick:"CPU GREEN",
                 color:"GREEN"
             },
             {
-                nick:"AI YELLOW",
+                nick:"CPU YELLOW",
                 color:"YELLOW"
             }
         ];
     }
 
-    // ===== UKRYJ MENU =====
+    // ===== MENU OFF =====
 
-    document.getElementById("menu")
-        .style.display = "none";
+    const menu =
+        document.getElementById("menu");
 
-    // ===== POKAŻ RZUT =====
+    if(menu){
+        menu.style.display = "none";
+    }
+
+    // ===== SHOW ROLL =====
 
     document.getElementById("rollBtn")
         .style.display = "block";
