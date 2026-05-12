@@ -137,47 +137,7 @@ button:hover{
 
     </div>
 
-    <!-- ===== OFFLINE ===== -->
 
-    <div
-        class="panel"
-        id="offlinePanel"
-        style="display:none"
-    >
-
-        <h1>OFFLINE</h1>
-
-        <input
-            id="offlineNick"
-            placeholder="Twój nick"
-            value="Arek"
-        >
-
-        <select id="offlinePlayers">
-
-            <option value="1">
-                1 gracz + 3 CPU
-            </option>
-
-            <option value="2">
-                2 graczy + 2 CPU
-            </option>
-
-            <option value="3">
-                3 graczy + 1 CPU
-            </option>
-
-            <option value="4">
-                4 graczy
-            </option>
-
-        </select>
-
-        <button onclick="startOfflineGame()">
-            START OFFLINE
-        </button>
-
-    </div>
 
     <!-- ===== ONLINE ===== -->
 
@@ -253,11 +213,7 @@ let isAdmin = false;
 
 function showOfflineMenu(){
 
-    document.getElementById("modePanel")
-        .style.display = "none";
-
-    document.getElementById("offlinePanel")
-        .style.display = "block";
+    location.href = "china_game_off.html";
 }
 
 function showOnlineMenu(){
