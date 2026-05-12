@@ -415,19 +415,22 @@ function updateInfo(text) {
 function rollDice() {
 
     if (!currentPlayer) return;
-	if (
-    currentPlayer.nick.startsWith("AI") === false &&
-    aiThinking
-) return;
+
     if (isAnimating) return;
+
     if (diceRolling) return;
+
     if (pendingDice !== null) return;
 
-    pendingDiceValue =
-        Math.floor(Math.random() * 6) + 1;
+    if(
+        !onlineConfig ||
+        !onlineConfig.roomId
+    ) return;
 
-    diceRolling = true;
-    diceStart = performance.now();
+    socket.emit(
+        "rollDice",
+        onlineConfig.roomId
+    );
 }
 function updateDice(time) {
 
@@ -1059,5 +1062,17 @@ function loop() {
 
     requestAnimationFrame(loop);
 }
+socket.on("diceRolled", value => {
 
+    pendingDiceValue = value;
+
+    diceRolling = true;
+
+    diceStart = performance.now();
+
+    console.log(
+        "ONLINE DICE:",
+        value
+    );
+});
 loop();
