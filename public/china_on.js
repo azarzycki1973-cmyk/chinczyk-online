@@ -420,7 +420,10 @@ function rollDice() {
 
     if (diceRolling) return;
 
-    if (pendingDice !== null) return;
+    if (
+        pendingDice !== null &&
+        !diceRolling
+    ) return;
 
     if(
         !onlineConfig ||
