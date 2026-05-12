@@ -121,83 +121,122 @@ button:hover{
 
 <div id="main">
 
-```
-<div class="panel">
+    <!-- ===== WYBÓR TRYBU ===== -->
 
-    <h1>OFFLINE</h1>
+    <div class="panel" id="modePanel">
 
-    <input
-        id="offlineNick"
-        placeholder="Twój nick"
-        value="Arek"
+        <h1>CHIŃCZYK</h1>
+
+        <button onclick="showOfflineMenu()">
+            OFFLINE
+        </button>
+
+        <button onclick="showOnlineMenu()">
+            ONLINE
+        </button>
+
+    </div>
+
+    <!-- ===== OFFLINE ===== -->
+
+    <div
+        class="panel"
+        id="offlinePanel"
+        style="display:none"
     >
 
-    <select id="offlinePlayers">
-        <option value="1">1 gracz + 3 CPU</option>
-        <option value="2">2 graczy + 2 CPU</option>
-        <option value="3">3 graczy + 1 CPU</option>
-        <option value="4">4 graczy</option>
-    </select>
-
-    <button onclick="startOfflineGame()">
-        START OFFLINE
-    </button>
-
-</div>
-
-<div class="panel">
-
-    <h1>ONLINE</h1>
-
-    <div id="onlineMenu">
+        <h1>OFFLINE</h1>
 
         <input
-            id="onlineNick"
+            id="offlineNick"
             placeholder="Twój nick"
-            value="Gacek"
+            value="Arek"
         >
 
-        <button onclick="createRoom()">
-            ZAŁÓŻ POKÓJ
-        </button>
+        <select id="offlinePlayers">
 
-        <input
-            id="roomInput"
-            placeholder="Kod pokoju"
-        >
+            <option value="1">
+                1 gracz + 3 CPU
+            </option>
 
-        <button onclick="joinRoom()">
-            DOŁĄCZ
-        </button>
+            <option value="2">
+                2 graczy + 2 CPU
+            </option>
 
-        <div id="status"></div>
+            <option value="3">
+                3 graczy + 1 CPU
+            </option>
 
-        <h2 style="margin-top:25px">
-            AKTYWNE POKOJE
-        </h2>
+            <option value="4">
+                4 graczy
+            </option>
 
-        <div id="roomsList"></div>
+        </select>
 
-    </div>
-
-    <div id="roomLobby">
-
-        <h2 id="roomTitle"></h2>
-
-        <div id="playersList"></div>
-
-        <button
-            id="startBtn"
-            onclick="startOnlineGame()"
-            style="display:none"
-        >
-            START GRY
+        <button onclick="startOfflineGame()">
+            START OFFLINE
         </button>
 
     </div>
 
-</div>
-```
+    <!-- ===== ONLINE ===== -->
+
+    <div
+        class="panel"
+        id="onlinePanel"
+        style="display:none"
+    >
+
+        <h1>ONLINE</h1>
+
+        <div id="onlineMenu">
+
+            <input
+                id="onlineNick"
+                placeholder="Twój nick"
+                value="Gacek"
+            >
+
+            <button onclick="createRoom()">
+                ZAŁÓŻ POKÓJ
+            </button>
+
+            <input
+                id="roomInput"
+                placeholder="Kod pokoju"
+            >
+
+            <button onclick="joinRoom()">
+                DOŁĄCZ
+            </button>
+
+            <div id="status"></div>
+
+            <h2 style="margin-top:25px">
+                AKTYWNE POKOJE
+            </h2>
+
+            <div id="roomsList"></div>
+
+        </div>
+
+        <div id="roomLobby">
+
+            <h2 id="roomTitle"></h2>
+
+            <div id="playersList"></div>
+
+            <button
+                id="startBtn"
+                onclick="startOnlineGame()"
+                style="display:none"
+            >
+                START GRY
+            </button>
+
+        </div>
+
+    </div>
 
 </div>
 
@@ -210,11 +249,35 @@ const socket = io();
 let myRoom = null;
 let isAdmin = false;
 
+// ===== MENU =====
+
+function showOfflineMenu(){
+
+    document.getElementById("modePanel")
+        .style.display = "none";
+
+    document.getElementById("offlinePanel")
+        .style.display = "block";
+}
+
+function showOnlineMenu(){
+
+    document.getElementById("modePanel")
+        .style.display = "none";
+
+    document.getElementById("onlinePanel")
+        .style.display = "block";
+}
+
+// ===== OFFLINE =====
+
 function startOfflineGame(){
-localStorage.setItem(
-    "china_mode",
-    "offline"
-);
+
+    localStorage.setItem(
+        "china_mode",
+        "offline"
+    );
+
     const nick =
         document.getElementById("offlineNick")
         .value || "Gracz";
@@ -260,7 +323,7 @@ localStorage.setItem(
     }
 
     localStorage.setItem(
-    "china_players",
+        "china_players",
         JSON.stringify({
             mode:"offline",
             players
@@ -269,6 +332,8 @@ localStorage.setItem(
 
     location.href = "china_game_off.html";
 }
+
+// ===== ONLINE =====
 
 function createRoom(){
 
@@ -404,10 +469,12 @@ function startOnlineGame(){
 }
 
 socket.on("gameStarted", onlinePlayers => {
-localStorage.setItem(
-    "china_mode",
-    "online"
-);
+
+    localStorage.setItem(
+        "china_mode",
+        "online"
+    );
+
     localStorage.setItem(
         "china_config",
         JSON.stringify({
