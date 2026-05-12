@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chińczyk</title>
+
+<style>
+
+body{
+    margin:0;
+    background:black;
+    overflow:hidden;
+    font-family:Arial;
+}
+
+/* ===== PLANSZA ===== */
+
+#game{
+    position:absolute;
+    left:0;
+    top:0;
+}
+
+/* ===== MENU ===== */
+
+#menu{
+    position:absolute;
+    right:20px;
+    top:120px;
+    width:220px;
+
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+
+    z-index:20;
+}
+
+input,
+select,
+button{
+
+    height:46px;
+
+    border:none;
+    border-radius:10px;
+
+    font-size:18px;
+
+    box-sizing:border-box;
+}
+
+input,
+select{
+
+    background:#222;
+    color:white;
+
+    padding-left:12px;
+}
+
+button{
+
+    background:#666;
+    color:white;
+
+    cursor:pointer;
+    font-weight:bold;
+}
+
+button:hover{
+    background:#888;
+}
+
+/* ===== HUD ===== */
+
+#info{
+
+    position:absolute;
+
+    right:10px;
+    top:10px;
+
+    width:190px;
+    min-height:110px;
+
+    background:rgba(0,0,0,0.55);
+
+    border-radius:12px;
+
+    padding:12px;
+
+    box-sizing:border-box;
+
+    color:white;
+    font-size:14px;
+    font-weight:bold;
+
+    line-height:1.35;
+    text-align:center;
+
+    z-index:30;
+
+    text-shadow:0 0 4px black;
+}
+
+/* ===== RZUC ===== */
+
+#rollBtn{
+
+    position:absolute;
+
+    right:45px;
+    bottom:120px;
+
+    width:120px;
+    height:46px;
+
+    display:none;
+
+    z-index:30;
+
+    font-size:20px;
+}
+
+/* ===== KOSTKA ===== */
+
+#diceCanvas{
+
+    position:absolute;
+
+    right:55px;
+    bottom:20px;
+
+    width:80px;
+    height:80px;
+
+    z-index:30;
+}
+
+</style>
+</head>
+
+<body>
+
+<canvas id="game"></canvas>
+
+<div id="info"></div>
+
+<!-- ===== MENU ===== -->
+
+<div id="menu">
+
+    <input
+        id="nick1"
+        placeholder="Gracz 1"
+        value="Gracz1"
+    >
+
+    <input
+        id="nick2"
+        placeholder="Gracz 2"
+        style="display:none"
+    >
+
+    <input
+        id="nick3"
+        placeholder="Gracz 3"
+        style="display:none"
+    >
+
+    <input
+        id="nick4"
+        placeholder="Gracz 4"
+        style="display:none"
+    >
+
+    <select
+        id="players"
+        onchange="updateNickInputs()"
+    >
+
+        <option value="1">
+            1 gracz + 3 CPU
+        </option>
+
+        <option value="2">
+            2 graczy + 2 CPU
+        </option>
+
+        <option value="3">
+            3 graczy + 1 CPU
+        </option>
+
+        <option value="4">
+            4 graczy
+        </option>
+
+    </select>
+
+    <button onclick="prepareGame()">
+        START
+    </button>
+
+</div>
+
+<!-- ===== GRA ===== -->
+
+<button id="rollBtn"
+onclick="rollDice()">
+RZUĆ
+</button>
+
+<canvas id="diceCanvas"></canvas>
+
+<div id="inputs" style="display:none"></div>
+
+<script>
+
+function updateNickInputs(){
+
+    const count =
+        parseInt(
+            document.getElementById("players").value
+        );
+
+    document.getElementById("nick2")
+        .style.display =
+            count >= 2 ? "block" : "none";
+
+    document.getElementById("nick3")
+        .style.display =
+            count >= 3 ? "block" : "none";
+
+    document.getElementById("nick4")
+        .style.display =
+            count >= 4 ? "block" : "none";
+}
+
+updateNickInputs();
+
+function prepareGame(){
+
+    const count =
+        parseInt(
+            document.getElementById("players").value
+        );
+
+    const COLORS = [
+        "RED",
+        "BLUE",
+        "GREEN",
+        "YELLOW"
+    ];
+
+    const players = [];
+
+    for(let i = 1; i <= count; i++){
+
+        const nick =
+            document.getElementById(
+                "nick" + i
+            ).value || ("Gracz" + i);
+
+        players.push({
+            nick:nick,
+            color:COLORS[i - 1]
+        });
+    }
+
+    while(players.length < 4){
+
+        const color =
+            COLORS[players.length];
+
+        players.push({
+            nick:"AI " + color,
+            color:color
+        });
+    }
+
+    localStorage.setItem(
+        "china_players",
+        JSON.stringify(players)
+    );
+
+    document.getElementById("menu")
+        .style.display = "none";
+
+    startGame();
+}
+
+</script>
+
+<script src="china.js"></script>
+
+</body>
+</html>
