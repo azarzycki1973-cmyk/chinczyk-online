@@ -327,6 +327,21 @@ function prepareGame(){
 
 </script>
 <script src="/socket.io/socket.io.js"></script>
+<script>
+
+window.addEventListener("load", () => {
+
+    const menu =
+        document.getElementById("menu");
+
+    if(menu){
+        menu.style.display = "none";
+    }
+
+    startGame();
+});
+
+</script>
 <script src="china_on.js"></script>
 
 </body>
