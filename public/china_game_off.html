@@ -217,19 +217,7 @@ RZUĆ
 <div id="inputs" style="display:none"></div>
 
 <script>
-const mode =
-    localStorage.getItem("china_mode");
 
-if(mode === "online"){
-
-    window.addEventListener("load", () => {
-
-        document.getElementById("menu")
-            .style.display = "none";
-
-        startGame();
-    });
-}
 function updateNickInputs(){
 
     const count =
@@ -251,29 +239,7 @@ function updateNickInputs(){
 }
 
 updateNickInputs();
-// ===== TRYB ONLINE =====
 
-const onlinePlayers =
-    localStorage.getItem("china_players");
-
-if(onlinePlayers){
-
-    const parsed =
-        JSON.parse(onlinePlayers);
-
-    const hasRealPlayers =
-        parsed.some(
-            p => !p.nick.startsWith("AI")
-        );
-
-    if(hasRealPlayers){
-
-        document.getElementById("menu")
-            .style.display = "none";
-
-        startGame();
-    }
-}
 function prepareGame(){
 
     const count =
