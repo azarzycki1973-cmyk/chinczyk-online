@@ -454,7 +454,13 @@ function updateDice(time) {
         diceOffsetY = 0;
 
         // 🔥 TU ODDAJEMY DO STAREJ LOGIKI
-        handleMove(pendingDiceValue);
+       console.log(
+    "DICE END:",
+    pendingDiceValue
+);
+
+// ONLINE TEST ONLY
+// handleMove(pendingDiceValue);
 
         return;
     }
