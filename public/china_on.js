@@ -7,15 +7,7 @@ console.log(
     "ONLINE CONFIG:",
     onlineConfig
 );
-const onlineConfig =
-    JSON.parse(
-        localStorage.getItem("china_config")
-    );
 
-console.log(
-    "ONLINE CONFIG:",
-    onlineConfig
-);
 
 const socket = io();
 
