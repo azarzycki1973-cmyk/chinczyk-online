@@ -429,7 +429,10 @@ function rollDice() {
         !onlineConfig ||
         !onlineConfig.roomId
     ) return;
-
+console.log(
+    "ROLL CLICK:",
+    onlineConfig.roomId
+);
     socket.emit(
         "rollDice",
         onlineConfig.roomId
