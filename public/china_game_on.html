@@ -339,7 +339,9 @@ window.addEventListener("load", () => {
     }
 
     if(typeof startGame === "function"){
-    startGame();
+    if(window.startGame){
+    window.startGame();
+}
 }
 });
 
