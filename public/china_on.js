@@ -1100,15 +1100,15 @@ function loop() {
 }
 socket.on("diceRolled", value => {
 
+    console.log(
+        "ONLINE DICE RECEIVED:",
+        value
+    );
+
     pendingDiceValue = value;
 
     diceRolling = true;
 
     diceStart = performance.now();
-
-    console.log(
-        "ONLINE DICE:",
-        value
-    );
 });
 loop();
