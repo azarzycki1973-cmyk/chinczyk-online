@@ -434,10 +434,14 @@ socket.on("gameStarted", onlinePlayers => {
     localStorage.setItem(
         "china_config",
         JSON.stringify({
-            mode:"online",
-            roomId:myRoom,
-            players:onlinePlayers
-        })
+    mode:"online",
+    roomId:myRoom,
+    nick:
+        document.getElementById(
+            "onlineNick"
+        ).value,
+    players:onlinePlayers
+})
     );
 
     location.href = "china_game_on.html";
