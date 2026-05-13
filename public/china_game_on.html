@@ -227,7 +227,10 @@ if(mode === "online"){
         document.getElementById("menu")
             .style.display = "none";
 
-        startGame();
+        if(window.startGame){
+
+            window.startGame();
+        }
     });
 }
 function updateNickInputs(){
@@ -271,7 +274,10 @@ if(onlinePlayers){
         document.getElementById("menu")
             .style.display = "none";
 
-        startGame();
+        if(window.startGame){
+
+    window.startGame();
+}
     }
 }
 function prepareGame(){

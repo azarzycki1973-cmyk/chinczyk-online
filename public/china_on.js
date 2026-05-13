@@ -339,7 +339,7 @@ function updateInputs() {
 }
 window.updateInputs = updateInputs;
 updateInputs();
-
+window.startGame = startGame;
 function startGame() {
 
     // ===== ONLINE PLAYERS =====
