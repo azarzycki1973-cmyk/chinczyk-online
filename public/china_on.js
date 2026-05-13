@@ -414,25 +414,49 @@ function updateInfo(text) {
 // ===== KOSTKA =====
 function rollDice() {
 
-    if (!currentPlayer) return;
+    console.log("ROLL START");
 
-    if (isAnimating) return;
+    if (!currentPlayer) {
 
-    if (diceRolling) return;
+        console.log("BLOCK currentPlayer");
+        return;
+    }
+
+    if (isAnimating) {
+
+        console.log("BLOCK isAnimating");
+        return;
+    }
+
+    if (diceRolling) {
+
+        console.log("BLOCK diceRolling");
+        return;
+    }
 
     if (
         pendingDice !== null &&
         !diceRolling
-    ) return;
+    ) {
+
+        console.log("BLOCK pendingDice");
+        return;
+    }
 
     if(
         !onlineConfig ||
         !onlineConfig.roomId
-    ) return;
-console.log(
-    "ROLL CLICK:",
-    onlineConfig.roomId
-);
+    ) {
+
+        console.log("BLOCK onlineConfig");
+        return;
+    }
+
+    console.log(
+        "EMIT ROLL:",
+        onlineConfig.roomId
+    );
+
     socket.emit(
         "rollDice",
         onlineConfig.roomId
