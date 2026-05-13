@@ -156,7 +156,10 @@ socket.on("startGame", roomId => {
 });
     // ===== ONLINE DICE =====
     socket.on("rollDice", roomId => {
-
+console.log(
+    "SERVER ROLL:",
+    roomId
+);
         const value =
             Math.floor(Math.random() * 6) + 1;
 
