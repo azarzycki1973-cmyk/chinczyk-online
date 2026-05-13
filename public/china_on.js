@@ -1142,3 +1142,32 @@ function loop() {
 }
 
 loop();
+const rollBtn =
+    document.getElementById("rollBtn");
+
+rollBtn.addEventListener(
+    "touchstart",
+    e => {
+
+        e.preventDefault();
+
+        console.log(
+            "TOUCH ROLL"
+        );
+
+        rollDice();
+    },
+    { passive:false }
+);
+
+rollBtn.addEventListener(
+    "click",
+    () => {
+
+        console.log(
+            "CLICK ROLL"
+        );
+
+        rollDice();
+    }
+);
