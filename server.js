@@ -111,6 +111,17 @@ sendRoomsList();
         );
 		sendRoomsList();
     });
+	// ===== REJOIN ROOM =====
+
+socket.on("rejoinRoom", roomId => {
+
+    socket.join(roomId);
+
+    console.log(
+        "REJOIN:",
+        roomId
+    );
+});
 
     // ===== START GAME =====
 socket.on("startGame", roomId => {

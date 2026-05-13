@@ -1,9 +1,46 @@
-const socket = io();socket.on("connect", () => {
+const onlineConfig =
+    JSON.parse(
+        localStorage.getItem("china_config")
+    );
+
+console.log(
+    "ONLINE CONFIG:",
+    onlineConfig
+);
+const onlineConfig =
+    JSON.parse(
+        localStorage.getItem("china_config")
+    );
+
+console.log(
+    "ONLINE CONFIG:",
+    onlineConfig
+);
+
+const socket = io();
+
+socket.on("connect", () => {
 
     console.log(
         "SOCKET CONNECTED:",
         socket.id
     );
+
+    if(
+        onlineConfig &&
+        onlineConfig.roomId
+    ){
+
+        socket.emit(
+            "rejoinRoom",
+            onlineConfig.roomId
+        );
+
+        console.log(
+            "REJOIN ROOM:",
+            onlineConfig.roomId
+        );
+    }
 });
 
 socket.on("diceRolled", value => {
@@ -19,13 +56,6 @@ socket.on("diceRolled", value => {
 
     diceStart = performance.now();
 });
-
-const onlineConfig =
-    JSON.parse(
-        localStorage.getItem("china_config")
-    );
-
-console.log("ONLINE CONFIG:", onlineConfig);
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 const diceCanvas = document.getElementById("diceCanvas");
