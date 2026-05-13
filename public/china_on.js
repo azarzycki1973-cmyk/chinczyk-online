@@ -1,4 +1,24 @@
-const socket = io();
+const socket = io();socket.on("connect", () => {
+
+    console.log(
+        "SOCKET CONNECTED:",
+        socket.id
+    );
+});
+
+socket.on("diceRolled", value => {
+
+    console.log(
+        "ONLINE DICE RECEIVED:",
+        value
+    );
+
+    pendingDiceValue = value;
+
+    diceRolling = true;
+
+    diceStart = performance.now();
+});
 
 const onlineConfig =
     JSON.parse(
@@ -1098,17 +1118,5 @@ function loop() {
 
     requestAnimationFrame(loop);
 }
-socket.on("diceRolled", value => {
 
-    console.log(
-        "ONLINE DICE RECEIVED:",
-        value
-    );
-
-    pendingDiceValue = value;
-
-    diceRolling = true;
-
-    diceStart = performance.now();
-});
 loop();
