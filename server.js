@@ -155,19 +155,40 @@ socket.on("startGame", roomId => {
     );
 });
     // ===== ONLINE DICE =====
-    socket.on("rollDice", roomId => {
-console.log(
-    "SERVER ROLL:",
-    roomId
-);
+socket.on("rollDice", roomId => {
+
+    console.log(
+        "SERVER ROLL RECEIVED:",
+        roomId
+    );
+
+    try{
+
         const value =
             Math.floor(Math.random() * 6) + 1;
+
+        console.log(
+            "SERVER DICE:",
+            value
+        );
 
         io.to(roomId).emit(
             "diceRolled",
             value
         );
-    });
+
+        console.log(
+            "SERVER EMIT OK"
+        );
+
+    }catch(err){
+
+        console.log(
+            "ROLL ERROR:",
+            err
+        );
+    }
+});
     // ===== DISCONNECT =====
     socket.on("disconnect", () => {
 
