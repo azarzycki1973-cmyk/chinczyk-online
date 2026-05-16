@@ -561,15 +561,31 @@ function createPeer(){
 
     // RECEIVE REMOTE
 
-    peer.ontrack = event => {
+    peer.ontrack = async event => {
+
+    console.log(
+        "REMOTE STREAM OK"
+    );
+
+    remoteVideo.srcObject =
+        event.streams[0];
+
+    try{
+
+        await remoteVideo.play();
 
         console.log(
-            "REMOTE STREAM OK"
+            "REMOTE PLAY OK"
         );
 
-        remoteVideo.srcObject =
-            event.streams[0];
-    };
+    }catch(err){
+
+        console.log(
+            "REMOTE PLAY ERROR",
+            err
+        );
+    }
+};
 
     // ICE
 
