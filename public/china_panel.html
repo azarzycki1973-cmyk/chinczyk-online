@@ -216,15 +216,13 @@ function showOfflineMenu(){
     location.href = "china_game_off.html";
 }
 
-async function showOnlineMenu(){
+function showOnlineMenu(){
 
     document.getElementById("modePanel")
         .style.display = "none";
 
     document.getElementById("onlinePanel")
         .style.display = "block";
-
-    await startMedia();
 }
 // ===== OFFLINE =====
 
