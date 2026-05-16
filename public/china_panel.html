@@ -569,6 +569,30 @@ const remoteStream =
 remoteVideo.srcObject =
     remoteStream;
 
+remoteVideo.onloadedmetadata =
+    async () => {
+
+        console.log(
+            "REMOTE METADATA OK"
+        );
+
+        try{
+
+            await remoteVideo.play();
+
+            console.log(
+                "REMOTE VIDEO PLAYING"
+            );
+
+        }catch(err){
+
+            console.log(
+                "REMOTE PLAY FAIL",
+                err
+            );
+        }
+    };
+
 peer.ontrack = event => {
 
     console.log(
