@@ -119,14 +119,20 @@ io.to(socket.id).emit(
         peerId: hostId
     }
 );
+io.to(data.roomId).emit(
+    "roomUpdated",
+    room.players
+);
 
-socket.join(data.roomId);
+console.log(
+    data.nick,
+    "JOINED",
+    data.roomId
+);
 
-room.players.push({
-    id: socket.id,
-    nick: data.nick,
-    admin: false
+sendRoomsList();
 });
+
 	// ===== REJOIN ROOM =====
 
 socket.on("rejoinRoom", roomId => {
