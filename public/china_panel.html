@@ -377,6 +377,8 @@ socket.on("roomUpdated", players => {
         .style.display = "none";
 
     renderPlayers(players);
+});
+
 socket.on("roomsList", rooms => {
 
     const div =
@@ -446,7 +448,6 @@ socket.on("gameStarted", onlinePlayers => {
     location.href = "china_game_on.html";
 });
 
-</script>
 socket.on("peerJoined", async data => {
 
     console.log(
@@ -459,6 +460,8 @@ socket.on("peerJoined", async data => {
         await startCall();
     }
 });
+
+</script>
 <!-- ===== VIDEO CHAT ===== -->
 
 <div id="videoBox"
