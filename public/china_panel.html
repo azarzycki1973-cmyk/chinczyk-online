@@ -502,7 +502,19 @@ border-radius:12px;
         border-radius:10px;
         object-fit:cover;
         "
-    ></video>
+    <video
+    id="remoteVideo"
+    autoplay
+    muted
+    playsinline
+    style="
+    width:180px;
+    height:120px;
+    background:black;
+    border-radius:10px;
+    object-fit:cover;
+    "
+></video>
 
 </div>
 
@@ -540,6 +552,7 @@ async function startMedia(){
         localVideo.srcObject = localStream;
 console.log(
     "LOCAL VIDEO OK"
+	remoteVideo.srcObject = localStream;
 );
         console.log("MEDIA OK");
 
