@@ -382,11 +382,10 @@ socket.on("roomCreated", data => {
     document.getElementById("roomLobby")
         .style.display = "flex";
 
-    document.getElementById("roomTitle")
-        .innerHTML = "POKÓJ: " + data.roomId;
+   
 
     document.getElementById("startBtn")
-        .style.display = "flex";
+    .style.display = "block";
 
     renderPlayers(data.players);
 });
@@ -398,6 +397,11 @@ socket.on("roomUpdated", players => {
 
     document.getElementById("onlineMenu")
         .style.display = "none";
+
+    document.getElementById(
+        "waitingText"
+    ).innerHTML =
+        "GRACZE GOTOWI";
 
     renderPlayers(players);
 });
