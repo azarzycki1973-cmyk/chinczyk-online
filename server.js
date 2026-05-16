@@ -1,8 +1,15 @@
+const webpush = require("web-push");
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
 const path = require("path");
+webpush.setVapidDetails(
+    "mailto:test@test.com",
+    "BF1w57nfnavC6YNUxS4hUWAxZmH-vvOa3C7NLbXNescG1c9tWuIO3Oj9vMvzVftW7DFyDVVyXmFDc9GQNuoy5KM",
+    "r74unQNz1m9y7JXpjorqFfUw25fwl-sKh2vSsxQ8Z_A"
+);
 
+let pushSubs = [];
 const app = express();
 const server = http.createServer(app);
 
@@ -44,8 +51,17 @@ function generateRoomId() {
 }
 
 io.on("connection", (socket) => {
+	
 sendRoomsList();
     console.log("ONLINE:", socket.id.slice(0,6));
+	// ===== PUSH SUB =====
+
+socket.on("pushSub", sub => {
+
+    pushSubs.push(sub);
+
+    console.log("PUSH SAVED");
+});
 
     // ===== CREATE ROOM =====
     socket.on("createRoom", (nick) => {
@@ -71,6 +87,27 @@ sendRoomsList();
         });
 
         console.log("ROOM CREATED:", roomId);
+		// ===== SEND PUSH =====
+
+pushSubs.forEach(sub => {
+
+    webpush.sendNotification(
+        sub,
+        JSON.stringify({
+
+            title:"Chińczyk Online",
+
+            body: nick + " zaprasza do gry!"
+
+        })
+
+    ).catch(err => {
+
+        console.log(err);
+
+    });
+
+});
 		sendRoomsList();
     });
 

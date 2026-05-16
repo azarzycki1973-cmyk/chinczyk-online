@@ -814,7 +814,9 @@ async function enablePush(){
             userVisibleOnly:true,
 
             applicationServerKey:
-            "BF1w57nfnavC6YNUxS4hUWAxZmH-vvOa3C7NLbXNescG1c9tWuIO3Oj9vMvzVftW7DFyDVVyXmFDc9GQNuoy5KM"
+urlBase64ToUint8Array(
+"BF1w57nfnavC6YNUxS4hUWAxZmH-vvOa3C7NLbXNescG1c9tWuIO3Oj9vMvzVftW7DFyDVVyXmFDc9GQNuoy5KM"
+)
 
         });
 
@@ -825,7 +827,30 @@ async function enablePush(){
         sub
     );
 }
+function urlBase64ToUint8Array(base64String) {
 
+    const padding =
+        '='.repeat((4 - base64String.length % 4) % 4);
+
+    const base64 =
+        (base64String + padding)
+        .replace(/\-/g, '+')
+        .replace(/_/g, '/');
+
+    const rawData =
+        window.atob(base64);
+
+    const outputArray =
+        new Uint8Array(rawData.length);
+
+    for (let i = 0; i < rawData.length; ++i) {
+
+        outputArray[i] =
+            rawData.charCodeAt(i);
+    }
+
+    return outputArray;
+}
 enablePush();
 
 </script>
