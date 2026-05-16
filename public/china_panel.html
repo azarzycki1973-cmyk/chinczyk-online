@@ -782,6 +782,52 @@ socket.on(
 );
 
 </script>
+<script>
 
+async function enablePush(){
+
+    const permission =
+        await Notification.requestPermission();
+
+    console.log(
+        "NOTIFICATION:",
+        permission
+    );
+
+    if(permission !== "granted"){
+
+        alert("BRAK ZGODY NA POWIADOMIENIA");
+
+        return;
+    }
+
+    const reg =
+        await navigator.serviceWorker.register(
+            "/sw.js"
+        );
+
+    console.log("SW READY");
+
+    const sub =
+        await reg.pushManager.subscribe({
+
+            userVisibleOnly:true,
+
+            applicationServerKey:
+            "BF1w57nfnavC6YNUxS4hUWAxZmH-vvOa3C7NLbXNescG1c9tWuIO3Oj9vMvzVftW7DFyDVVyXmFDc9GQNuoy5KM"
+
+        });
+
+    console.log("PUSH OK");
+
+    socket.emit(
+        "pushSub",
+        sub
+    );
+}
+
+enablePush();
+
+</script>
 </body>
 </html>
