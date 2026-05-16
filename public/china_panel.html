@@ -492,18 +492,7 @@ border-radius:12px;
         "
     ></video>
 
-    <video
-        id="remoteVideo"
-        autoplay
-        playsinline
-        style="
-        width:180px;
-        height:120px;
-        background:black;
-        border-radius:10px;
-        object-fit:cover;
-        "
-    <video
+<video
     id="remoteVideo"
     autoplay
     muted
@@ -550,10 +539,12 @@ async function startMedia(){
                 audio:true
             });
 
-        localVideo.srcObject = localStream;
+localVideo.srcObject = localStream;
+
+remoteVideo.srcObject = localStream;
+
 console.log(
     "LOCAL VIDEO OK"
-	remoteVideo.srcObject = localStream;
 );
         console.log("MEDIA OK");
 
