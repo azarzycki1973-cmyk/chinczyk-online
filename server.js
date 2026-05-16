@@ -91,7 +91,7 @@ sendRoomsList();
             return;
         }
 
-        room.players.push({
+room.players.push({
     id: socket.id,
     nick: data.nick,
     admin: false
@@ -100,6 +100,12 @@ sendRoomsList();
 const hostId =
     room.host;
 
+console.log(
+    "PEER CONNECT:",
+    hostId,
+    socket.id
+);
+
 io.to(hostId).emit(
     "peerJoined",
     {
@@ -107,7 +113,7 @@ io.to(hostId).emit(
     }
 );
 
-socket.emit(
+io.to(socket.id).emit(
     "peerJoined",
     {
         peerId: hostId
