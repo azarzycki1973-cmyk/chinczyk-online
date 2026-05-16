@@ -449,35 +449,7 @@ socket.on("gameStarted", onlinePlayers => {
     location.href = "china_game_on.html";
 });
 
-socket.on("peerJoined", async data => {
 
-    console.log(
-        "PEER JOINED EVENT:",
-        data.peerId
-    );
-
-    if(isAdmin){
-
-        await startMedia();
-
-        await createPeer();
-
-        const offer =
-            await peerConnection
-            .createOffer();
-
-        await peerConnection
-            .setLocalDescription(offer);
-
-        socket.emit(
-            "offer",
-            {
-                roomId: myRoom,
-                offer
-            }
-        );
-    }
-});
 
 </script>
 <!-- ===== VIDEO CHAT ===== -->
