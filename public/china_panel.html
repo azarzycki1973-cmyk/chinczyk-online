@@ -310,6 +310,7 @@ function joinRoom(){
         document.getElementById("roomInput")
         .value
         .toUpperCase();
+		myRoom = roomId;
 
     socket.emit("joinRoom", {
         nick,
@@ -318,7 +319,7 @@ function joinRoom(){
 }
 
 function quickJoin(roomId){
-
+myRoom = roomId;
     const nick =
         document.getElementById("onlineNick")
         .value || "Gracz";
