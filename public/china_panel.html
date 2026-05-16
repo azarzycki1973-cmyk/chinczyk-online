@@ -91,9 +91,7 @@ button:hover{
     color:#aaa;
 }
 
-#roomLobby{
-    display:none;
-}
+
 #roomLobby{
 
     display:none;
@@ -247,7 +245,7 @@ function showOnlineMenu(){
         .style.display = "none";
 
     document.getElementById("onlinePanel")
-        .style.display = "block";
+        .style.display = "flex";
 }
 // ===== OFFLINE =====
 
@@ -356,20 +354,7 @@ myRoom = roomId;
 
 function renderPlayers(players){
 
-    const list =
-        document.getElementById("playersList");
-
-    list.innerHTML = "";
-
-    players.forEach(p => {
-
-        list.innerHTML += `
-            <div class="playerLine">
-                ${p.nick}
-                ${p.admin ? '<span class="admin"> ⭐</span>' : ''}
-            </div>
-        `;
-    });
+    // lobby uproszczone
 }
 
 socket.on("roomCreated", data => {
@@ -381,13 +366,13 @@ socket.on("roomCreated", data => {
         .style.display = "none";
 
     document.getElementById("roomLobby")
-        .style.display = "block";
+        .style.display = "flex";
 
     document.getElementById("roomTitle")
         .innerHTML = "POKÓJ: " + data.roomId;
 
     document.getElementById("startBtn")
-        .style.display = "block";
+        .style.display = "flex";
 
     renderPlayers(data.players);
 });
@@ -395,7 +380,7 @@ socket.on("roomCreated", data => {
 socket.on("roomUpdated", players => {
 
     document.getElementById("roomLobby")
-        .style.display = "block";
+        .style.display = "flex";
 
     document.getElementById("onlineMenu")
         .style.display = "none";
