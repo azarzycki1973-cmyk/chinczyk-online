@@ -376,16 +376,20 @@ socket.on("roomUpdated", players => {
         .style.display = "none";
 
     renderPlayers(players);
-	if(players.length >= 2){
+if(players.length === 2){
 
-    setTimeout(() => {
+    setTimeout(async () => {
 
         if(isAdmin){
 
-            startCall();
+            console.log(
+                "START WEBRTC"
+            );
+
+            await startCall();
         }
 
-    }, 1000);
+    }, 2000);
 }
 });
 
