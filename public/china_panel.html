@@ -433,12 +433,13 @@ async function startOnlineGame(){
     );
 }
 
-socket.on("gameStarted", onlinePlayers => {
+socket.on("gameStarted", async onlinePlayers => {
 gameStarted = true;
 
 document.getElementById(
     "videoBox"
 ).style.display = "flex";
+await startMedia();
     localStorage.setItem(
         "china_mode",
         "online"
