@@ -92,10 +92,27 @@ sendRoomsList();
         }
 
         room.players.push({
-            id: socket.id,
-            nick: data.nick,
-            admin: false
-        });
+    id: socket.id,
+    nick: data.nick,
+    admin: false
+});
+
+const hostId =
+    room.host;
+
+io.to(hostId).emit(
+    "peerJoined",
+    {
+        peerId: socket.id
+    }
+);
+
+socket.emit(
+    "peerJoined",
+    {
+        peerId: hostId
+    }
+);
 
         socket.join(data.roomId);
 

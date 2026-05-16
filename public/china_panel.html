@@ -377,23 +377,6 @@ socket.on("roomUpdated", players => {
         .style.display = "none";
 
     renderPlayers(players);
-if(players.length === 2){
-
-    setTimeout(async () => {
-
-        if(isAdmin){
-
-            console.log(
-                "START WEBRTC"
-            );
-
-            await startCall();
-        }
-
-    }, 2000);
-}
-});
-
 socket.on("roomsList", rooms => {
 
     const div =
@@ -462,7 +445,18 @@ socket.on("gameStarted", onlinePlayers => {
 
     location.href = "china_game_on.html";
 });
+socket.on("peerJoined", async data => {
 
+    console.log(
+        "PEER JOINED:",
+        data.peerId
+    );
+
+    if(isAdmin){
+
+        await startCall();
+    }
+});
 </script>
 <!-- ===== VIDEO CHAT ===== -->
 
