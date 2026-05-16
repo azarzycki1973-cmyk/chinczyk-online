@@ -90,7 +90,7 @@ sendRoomsList();
             socket.emit("joinError", "Pokój pełny");
             return;
         }
-
+socket.join(data.roomId);
 room.players.push({
     id: socket.id,
     nick: data.nick,
@@ -120,20 +120,13 @@ io.to(socket.id).emit(
     }
 );
 
-        socket.join(data.roomId);
+socket.join(data.roomId);
 
-        io.to(data.roomId).emit(
-            "roomUpdated",
-            room.players
-        );
-
-        console.log(
-            data.nick,
-            "JOINED",
-            data.roomId
-        );
-		sendRoomsList();
-    });
+room.players.push({
+    id: socket.id,
+    nick: data.nick,
+    admin: false
+});
 	// ===== REJOIN ROOM =====
 
 socket.on("rejoinRoom", roomId => {
