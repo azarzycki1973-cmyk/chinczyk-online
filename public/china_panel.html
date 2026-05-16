@@ -511,20 +511,17 @@ border-radius:12px;
 
 let localStream = null;
 let peerConnection = null;
-let pendingCandidates = [];
+
 const localVideo =
     document.getElementById("localVideo");
 
 const remoteVideo =
     document.getElementById("remoteVideo");
 
-cconst rtcConfig = {
+const rtcConfig = {
     iceServers: [
         {
-            urls: [
-                "stun:stun.l.google.com:19302",
-                "stun:global.stun.twilio.com:3478"
-            ]
+            urls: "stun:stun.l.google.com:19302"
         }
     ]
 };
@@ -541,7 +538,9 @@ async function startMedia(){
             });
 
         localVideo.srcObject = localStream;
-
+console.log(
+    "LOCAL VIDEO OK"
+);
         console.log("MEDIA OK");
 
     }catch(err){
@@ -596,6 +595,9 @@ async function startCall(){
     await startMedia();
 
     await createPeer();
+	console.log(
+    "PEER CREATED"
+);
 
     const offer =
         await peerConnection
@@ -622,15 +624,7 @@ socket.on("offer", async data => {
     await startMedia();
 
     await createPeer();
-for(const c of pendingCandidates){
 
-    await peerConnection
-        .addIceCandidate(
-            new RTCIceCandidate(c)
-        );
-}
-
-pendingCandidates = [];
     await peerConnection
         .setRemoteDescription(
             new RTCSessionDescription(
@@ -674,21 +668,12 @@ socket.on("iceCandidate", async data => {
 
     try{
 
-        if(peerConnection){
-
-            await peerConnection
-                .addIceCandidate(
-                    new RTCIceCandidate(
-                        data.candidate
-                    )
-                );
-
-        }else{
-
-            pendingCandidates.push(
-                data.candidate
+        await peerConnection
+            .addIceCandidate(
+                new RTCIceCandidate(
+                    data.candidate
+                )
             );
-        }
 
     }catch(err){
 
