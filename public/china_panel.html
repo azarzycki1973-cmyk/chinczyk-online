@@ -94,7 +94,35 @@ button:hover{
 #roomLobby{
     display:none;
 }
+#roomLobby{
 
+    display:none;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    justify-content:center;
+}
+
+#startBtn{
+
+    width:180px;
+
+    height:55px;
+
+    font-size:24px;
+
+    border-radius:16px;
+
+    background:#111;
+
+    border:2px solid #333;
+
+    color:white;
+
+    margin-top:20px;
+}
 .playerLine{
     margin-top:10px;
     padding:10px;
@@ -182,19 +210,15 @@ button:hover{
 
         <div id="roomLobby">
 
-            <h2 id="roomTitle"></h2>
+    <button
+        id="startBtn"
+        onclick="startOnlineGame()"
+        style="display:none"
+    >
+        GRA
+    </button>
 
-            <div id="playersList"></div>
-
-            <button
-                id="startBtn"
-                onclick="startOnlineGame()"
-                style="display:none"
-            >
-                START GRY
-            </button>
-
-        </div>
+</div>
 
     </div>
 
