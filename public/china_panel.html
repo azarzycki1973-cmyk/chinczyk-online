@@ -455,14 +455,15 @@ socket.on("gameStarted", onlinePlayers => {
 <div id="videoBox"
 style="
 position:fixed;
-right:10px;
-bottom:10px;
-z-index:999;
+left:20px;
+bottom:20px;
+z-index:99999;
 display:flex;
-gap:10px;
-background:rgba(0,0,0,0.7);
-padding:10px;
-border-radius:12px;
+flex-direction:column;
+gap:20px;
+background:red;
+padding:20px;
+border:5px solid yellow;
 ">
 
     <!-- LOCAL -->
@@ -489,12 +490,12 @@ border-radius:12px;
     muted
     playsinline
         style="
-        width:180px;
-        height:120px;
-        background:black;
-        border-radius:10px;
-        object-fit:cover;
-        "
+width:320px;
+height:240px;
+background:lime;
+border:5px solid cyan;
+display:block;
+"
     ></video>
 
 </div>
