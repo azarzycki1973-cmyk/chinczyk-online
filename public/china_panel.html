@@ -208,6 +208,7 @@ const socket = io();
 
 let myRoom = null;
 let isAdmin = false;
+let gameStarted = false;
 
 // ===== MENU =====
 
@@ -425,7 +426,11 @@ function startOnlineGame(){
 }
 
 socket.on("gameStarted", onlinePlayers => {
+gameStarted = true;
 
+document.getElementById(
+    "videoBox"
+).style.display = "flex";
     localStorage.setItem(
         "china_mode",
         "online"
@@ -458,7 +463,7 @@ position:fixed;
 left:20px;
 bottom:20px;
 z-index:99999;
-display:flex;
+display:none;
 flex-direction:column;
 gap:20px;
 background:red;
@@ -635,7 +640,7 @@ socket.on(
     "peerJoined",
     async () => {
 
-        if(!isAdmin) return;
+        if(!isAdmin || !gameStarted) return;
 
         console.log(
             "HOST START"
