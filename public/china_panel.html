@@ -563,9 +563,22 @@ function createPeer(){
 
     peer.ontrack = async event => {
 
-    console.log(
-        "REMOTE STREAM OK"
-    );
+   console.log(
+    "REMOTE STREAM OK",
+    event.streams[0]
+);
+
+console.log(
+    "VIDEO TRACKS:",
+    event.streams[0]
+        .getVideoTracks()
+);
+
+console.log(
+    "AUDIO TRACKS:",
+    event.streams[0]
+        .getAudioTracks()
+);
 
     remoteVideo.srcObject =
         event.streams[0];
