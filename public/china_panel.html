@@ -445,6 +445,8 @@ socket.on("gameStarted", onlinePlayers => {
 
     location.href = "china_game_on.html";
 });
+
+</script>
 socket.on("peerJoined", async data => {
 
     console.log(
@@ -457,7 +459,6 @@ socket.on("peerJoined", async data => {
         await startCall();
     }
 });
-</script>
 <!-- ===== VIDEO CHAT ===== -->
 
 <div id="videoBox"
