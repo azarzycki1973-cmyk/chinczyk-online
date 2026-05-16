@@ -513,52 +513,82 @@ await startMedia();
 <div id="videoBox"
 style="
 position:fixed;
-left:20px;
-bottom:20px;
+left:10px;
+bottom:10px;
 z-index:99999;
 display:none;
-flex-direction:column;
-gap:12px;
 background:#000;
-padding:12px;
+padding:10px;
 border:2px solid #222;
 border-radius:16px;
-">
+"
+>
 
-    <!-- LOCAL -->
+<div
+style="
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+"
+>
 
     <video
         id="localVideo"
         autoplay
-        
         playsinline
         style="
 width:140px;
-height:95px;
+height:120px;
 background:black;
 border:2px solid #333;
 border-radius:12px;
 object-fit:cover;
 "
     ></video>
-
-    <!-- REMOTE -->
 
     <video
-    id="remoteVideo2"
-    autoplay
-    
-    playsinline
+        id="remoteVideo2"
+        autoplay
+        playsinline
         style="
-width:240px;
-height:180px;
+width:140px;
+height:120px;
 background:black;
 border:2px solid #333;
 border-radius:12px;
-display:block;
 object-fit:cover;
 "
     ></video>
+
+    <video
+        id="remoteVideo3"
+        autoplay
+        playsinline
+        style="
+width:140px;
+height:120px;
+background:black;
+border:2px solid #333;
+border-radius:12px;
+object-fit:cover;
+"
+    ></video>
+
+    <video
+        id="remoteVideo4"
+        autoplay
+        playsinline
+        style="
+width:140px;
+height:120px;
+background:black;
+border:2px solid #333;
+border-radius:12px;
+object-fit:cover;
+"
+    ></video>
+
+</div>
 
 </div>
 
