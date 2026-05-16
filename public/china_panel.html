@@ -417,7 +417,15 @@ socket.on("joinError", msg => {
         .innerHTML = msg;
 });
 
-function startOnlineGame(){
+async function startOnlineGame(){
+
+    gameStarted = true;
+
+    document.getElementById(
+        "videoBox"
+    ).style.display = "flex";
+
+    await startMedia();
 
     socket.emit(
         "startGame",
