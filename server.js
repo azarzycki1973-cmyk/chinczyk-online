@@ -200,6 +200,40 @@ socket.on("rollDice", roomId => {
         );
     }
 });
+// ===== WEBRTC SIGNAL =====
+
+socket.on("offer", data => {
+
+    socket.to(data.roomId).emit(
+        "offer",
+        {
+            offer: data.offer,
+            from: socket.id
+        }
+    );
+});
+
+socket.on("answer", data => {
+
+    socket.to(data.roomId).emit(
+        "answer",
+        {
+            answer: data.answer,
+            from: socket.id
+        }
+    );
+});
+
+socket.on("iceCandidate", data => {
+
+    socket.to(data.roomId).emit(
+        "iceCandidate",
+        {
+            candidate: data.candidate,
+            from: socket.id
+        }
+    );
+});
     // ===== DISCONNECT =====
     socket.on("disconnect", () => {
 

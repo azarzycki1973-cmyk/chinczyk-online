@@ -376,6 +376,17 @@ socket.on("roomUpdated", players => {
         .style.display = "none";
 
     renderPlayers(players);
+	if(players.length >= 2){
+
+    setTimeout(() => {
+
+        if(isAdmin){
+
+            startCall();
+        }
+
+    }, 1000);
+}
 });
 
 socket.on("roomsList", rooms => {
@@ -448,6 +459,222 @@ socket.on("gameStarted", onlinePlayers => {
 });
 
 </script>
+<!-- ===== VIDEO CHAT ===== -->
 
+<div id="videoBox"
+style="
+position:fixed;
+right:10px;
+bottom:10px;
+z-index:999;
+display:flex;
+gap:10px;
+background:rgba(0,0,0,0.7);
+padding:10px;
+border-radius:12px;
+">
+
+    <video
+        id="localVideo"
+        autoplay
+        muted
+        playsinline
+        style="
+        width:180px;
+        height:120px;
+        background:black;
+        border-radius:10px;
+        object-fit:cover;
+        "
+    ></video>
+
+    <video
+        id="remoteVideo"
+        autoplay
+        playsinline
+        style="
+        width:180px;
+        height:120px;
+        background:black;
+        border-radius:10px;
+        object-fit:cover;
+        "
+    ></video>
+
+</div>
+
+<script>
+
+let localStream = null;
+let peerConnection = null;
+
+const localVideo =
+    document.getElementById("localVideo");
+
+const remoteVideo =
+    document.getElementById("remoteVideo");
+
+const rtcConfig = {
+    iceServers: [
+        {
+            urls: "stun:stun.l.google.com:19302"
+        }
+    ]
+};
+
+async function startMedia(){
+
+    try{
+
+        localStream =
+            await navigator.mediaDevices
+            .getUserMedia({
+                video:true,
+                audio:true
+            });
+
+        localVideo.srcObject = localStream;
+
+        console.log("MEDIA OK");
+
+    }catch(err){
+
+        console.log(
+            "MEDIA ERROR:",
+            err
+        );
+    }
+}
+
+async function createPeer(){
+
+    peerConnection =
+        new RTCPeerConnection(rtcConfig);
+
+    localStream
+        .getTracks()
+        .forEach(track => {
+
+            peerConnection.addTrack(
+                track,
+                localStream
+            );
+        });
+
+    peerConnection.ontrack = event => {
+
+        remoteVideo.srcObject =
+            event.streams[0];
+    };
+
+    peerConnection.onicecandidate = event => {
+
+        if(event.candidate){
+
+            socket.emit(
+                "iceCandidate",
+                {
+                    roomId: myRoom,
+                    candidate: event.candidate
+                }
+            );
+        }
+    };
+}
+
+// ===== HOST START =====
+
+async function startCall(){
+
+    await startMedia();
+
+    await createPeer();
+
+    const offer =
+        await peerConnection
+        .createOffer();
+
+    await peerConnection
+        .setLocalDescription(offer);
+
+    socket.emit(
+        "offer",
+        {
+            roomId: myRoom,
+            offer
+        }
+    );
+}
+
+// ===== RECEIVE OFFER =====
+
+socket.on("offer", async data => {
+
+    console.log("OFFER RECEIVED");
+
+    await startMedia();
+
+    await createPeer();
+
+    await peerConnection
+        .setRemoteDescription(
+            new RTCSessionDescription(
+                data.offer
+            )
+        );
+
+    const answer =
+        await peerConnection
+        .createAnswer();
+
+    await peerConnection
+        .setLocalDescription(answer);
+
+    socket.emit(
+        "answer",
+        {
+            roomId: myRoom,
+            answer
+        }
+    );
+});
+
+// ===== RECEIVE ANSWER =====
+
+socket.on("answer", async data => {
+
+    console.log("ANSWER RECEIVED");
+
+    await peerConnection
+        .setRemoteDescription(
+            new RTCSessionDescription(
+                data.answer
+            )
+        );
+});
+
+// ===== ICE =====
+
+socket.on("iceCandidate", async data => {
+
+    try{
+
+        await peerConnection
+            .addIceCandidate(
+                new RTCIceCandidate(
+                    data.candidate
+                )
+            );
+
+    }catch(err){
+
+        console.log(
+            "ICE ERROR:",
+            err
+        );
+    }
+});
+
+</script>
 </body>
 </html>
