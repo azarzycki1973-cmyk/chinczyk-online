@@ -563,31 +563,25 @@ function createPeer(){
 
 let remoteLoaded = false;
 
+const remoteStream =
+    new MediaStream();
+
+remoteVideo.srcObject =
+    remoteStream;
+
 peer.ontrack = event => {
 
     console.log(
-        "REMOTE STREAM OK"
+        "TRACK RECEIVED:",
+        event.track.kind
     );
 
-    if(remoteLoaded) return;
-
-    remoteLoaded = true;
-
-    const remoteStream =
-        new MediaStream();
-
-    event.streams[0]
-        .getTracks()
-        .forEach(track => {
-
-            remoteStream.addTrack(track);
-        });
-
-    remoteVideo.srcObject =
-        remoteStream;
+    remoteStream.addTrack(
+        event.track
+    );
 
     console.log(
-        "REMOTE VIDEO SET"
+        "TRACK ADDED"
     );
 };
 
