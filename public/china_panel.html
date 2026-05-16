@@ -570,14 +570,16 @@ const remoteStream =
 remoteVideo.srcObject =
     remoteStream;
 
-remoteVideo.onloadedmetadata =
+remoteVideo.onloadeddata =
     async () => {
 
         console.log(
-            "REMOTE METADATA OK"
+            "REMOTE DATA READY"
         );
 
         try{
+
+            remoteVideo.muted = true;
 
             await remoteVideo.play();
 
