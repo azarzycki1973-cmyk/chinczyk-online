@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chińczyk Online - Panel</title>
+
+<style>
+
+body{
+    margin:0;
+    background:black;
+    color:white;
+    font-family:Arial;
+    overflow:visible;
+}
+
+#main{
+    width:100vw;
+    height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:18px;
+}
+
+.panel{
+    width:260px;
+    background:#111;
+    border-radius:20px;
+    padding:14px;
+    box-sizing:border-box;
+    border:2px solid #333;
+}
+
+h1{
+    margin-top:0;
+    text-align:center;
+    font-size:24px;
+}
+
+h2{
+    margin-top:0;
+}
+
+input,
+select,
+button{
+    width:100%;
+    height:36px;
+    border:none;
+    border-radius:12px;
+    margin-top:12px;
+    font-size:14px;
+    box-sizing:border-box;
+}
+
+input,
+select{
+    padding-left:15px;
+    background:#222;
+    color:white;
+}
+
+button{
+    background:#5a5a5a;
+    color:white;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+button:hover{
+    background:#777;
+}
+
+.room{
+    margin-top:12px;
+    background:#1b1b1b;
+    border-radius:8px;
+    padding:12px;
+}
+
+.roomTitle{
+    font-size:12px;
+    font-weight:bold;
+}
+
+.roomCount{
+    margin-top:5px;
+    color:#aaa;
+}
+
+#roomLobby{
+    display:none;
+}
+
+.playerLine{
+    margin-top:10px;
+    padding:10px;
+    background:#1d1d1d;
+    border-radius:10px;
+    font-size:14px;
+}
+
+.admin{
+    color:gold;
+}
+
+#status{
+    margin-top:15px;
+    color:lime;
+    font-size:20px;
+    text-align:center;
+}
+
+</style>
+
+</head>
+<body>
+
+<div id="main">
+
+    <!-- ===== WYBÓR TRYBU ===== -->
+
+    <div class="panel" id="modePanel">
+
+        <h1>CHIŃCZYK</h1>
+
+        <button onclick="showOfflineMenu()">
+            OFFLINE
+        </button>
+
+        <button onclick="showOnlineMenu()">
+            ONLINE
+        </button>
+
+    </div>
+
+
+
+    <!-- ===== ONLINE ===== -->
+
+    <div
+        class="panel"
+        id="onlinePanel"
+        style="display:none"
+    >
+
+        <h1>ONLINE</h1>
+
+        <div id="onlineMenu">
+
+            <input
+                id="onlineNick"
+                placeholder="Twój nick"
+                value="Gacek"
+            >
+
+            <button onclick="createRoom()">
+                ZAŁÓŻ POKÓJ
+            </button>
+
+            <input
+                id="roomInput"
+                placeholder="Kod pokoju"
+            >
+
+            <button onclick="joinRoom()">
+                DOŁĄCZ
+            </button>
+
+            <div id="status"></div>
+
+            <h2 style="margin-top:25px">
+                AKTYWNE POKOJE
+            </h2>
+
+            <div id="roomsList"></div>
+
+        </div>
+
+        <div id="roomLobby">
+
+            <h2 id="roomTitle"></h2>
+
+            <div id="playersList"></div>
+
+            <button
+                id="startBtn"
+                onclick="startOnlineGame()"
+                style="display:none"
+            >
+                START GRY
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+
+const socket = io();
+
+let myRoom = null;
+let isAdmin = false;
+let gameStarted = false;
+
+// ===== MENU =====
+
+function showOfflineMenu(){
+
+    location.href = "china_game_off.html";
+}
+
+function showOnlineMenu(){
+
+    document.getElementById("modePanel")
+        .style.display = "none";
+
+    document.getElementById("onlinePanel")
+        .style.display = "block";
+}
+// ===== OFFLINE =====
+
+function startOfflineGame(){
+
+    localStorage.setItem(
+        "china_mode",
+        "offline"
+    );
+
+    const nick =
+        document.getElementById("offlineNick")
+        .value || "Gracz";
+
+    const playerCount = parseInt(
+        document.getElementById("offlinePlayers")
+        .value
+    );
+
+    const COLORS = [
+        "RED",
+        "BLUE",
+        "GREEN",
+        "YELLOW"
+    ];
+
+    const players = [];
+
+    players.push({
+        nick,
+        color:"RED",
+        ai:false
+    });
+
+    for(let i = 1; i < playerCount; i++){
+
+        players.push({
+            nick:"Gracz " + (i + 1),
+            color:COLORS[i],
+            ai:false
+        });
+    }
+
+    while(players.length < 4){
+
+        const color = COLORS[players.length];
+
+        players.push({
+            nick:"AI " + color,
+            color,
+            ai:true
+        });
+    }
+
+    localStorage.setItem(
+        "china_players",
+        JSON.stringify({
+            mode:"offline",
+            players
+        })
+    );
+
+    location.href = "china_game_off.html";
+}
+
+// ===== ONLINE =====
+
+function createRoom(){
+
+    const nick =
+        document.getElementById("onlineNick")
+        .value || "Gracz";
+
+    socket.emit("createRoom", nick);
+}
+
+function joinRoom(){
+
+    const nick =
+        document.getElementById("onlineNick")
+        .value || "Gracz";
+
+    const roomId =
+        document.getElementById("roomInput")
+        .value
+        .toUpperCase();
+		myRoom = roomId;
+
+    socket.emit("joinRoom", {
+        nick,
+        roomId
+    });
+}
+
+function quickJoin(roomId){
+myRoom = roomId;
+    const nick =
+        document.getElementById("onlineNick")
+        .value || "Gracz";
+
+    socket.emit("joinRoom", {
+        nick,
+        roomId
+    });
+}
+
+function renderPlayers(players){
+
+    const list =
+        document.getElementById("playersList");
+
+    list.innerHTML = "";
+
+    players.forEach(p => {
+
+        list.innerHTML += `
+            <div class="playerLine">
+                ${p.nick}
+                ${p.admin ? '<span class="admin"> ⭐</span>' : ''}
+            </div>
+        `;
+    });
+}
+
+socket.on("roomCreated", data => {
+
+    myRoom = data.roomId;
+    isAdmin = true;
+
+    document.getElementById("onlineMenu")
+        .style.display = "none";
+
+    document.getElementById("roomLobby")
+        .style.display = "block";
+
+    document.getElementById("roomTitle")
+        .innerHTML = "POKÓJ: " + data.roomId;
+
+    document.getElementById("startBtn")
+        .style.display = "block";
+
+    renderPlayers(data.players);
+});
+
+socket.on("roomUpdated", players => {
+
+    document.getElementById("roomLobby")
+        .style.display = "block";
+
+    document.getElementById("onlineMenu")
+        .style.display = "none";
+
+    renderPlayers(players);
+});
+
+socket.on("roomsList", rooms => {
+
+    const div =
+        document.getElementById("roomsList");
+
+    div.innerHTML = "";
+
+    rooms.forEach(room => {
+
+        div.innerHTML += `
+
+            <div class="room">
+
+                <div class="roomTitle">
+                    ${room.roomId}
+                </div>
+
+                <div class="roomCount">
+                    GRACZE: ${room.count}/4
+                </div>
+
+                <button
+                    onclick="quickJoin('${room.roomId}')"
+                >
+                    DOŁĄCZ
+                </button>
+
+            </div>
+        `;
+    });
+});
+
+socket.on("joinError", msg => {
+
+    document.getElementById("status")
+        .innerHTML = msg;
+});
+
+async function startOnlineGame(){
+
+    gameStarted = true;
+
+    document.getElementById(
+        "videoBox"
+    ).style.display = "flex";
+
+    await startMedia();
+
+    createPeer();
+
+    const offer =
+        await peer.createOffer();
+
+    await peer.setLocalDescription(
+        offer
+    );
+
+    socket.emit(
+        "offer",
+        {
+            roomId: myRoom,
+            offer
+        }
+    );
+
+    socket.emit(
+        "startGame",
+        myRoom
+    );
+}
+
+socket.on("gameStarted", async onlinePlayers => {
+gameStarted = true;
+
+document.getElementById(
+    "videoBox"
+).style.display = "flex";
+await startMedia();
+    localStorage.setItem(
+        "china_mode",
+        "online"
+    );
+
+    localStorage.setItem(
+        "china_config",
+        JSON.stringify({
+    mode:"online",
+    roomId:myRoom,
+    nick:
+        document.getElementById(
+            "onlineNick"
+        ).value,
+    players:onlinePlayers
+})
+    );
+
+    //location.href = "china_game_on.html";
+});
+
+
+
+</script>
+<!-- ===== VIDEO CHAT ===== -->
+
+<div id="videoBox"
+style="
+position:fixed;
+left:20px;
+bottom:20px;
+z-index:99999;
+display:none;
+flex-direction:column;
+gap:12px;
+background:#000;
+padding:12px;
+border:2px solid #222;
+border-radius:16px;
+">
+
+    <!-- LOCAL -->
+
+    <video
+        id="localVideo"
+        autoplay
+        
+        playsinline
+        style="
+width:140px;
+height:95px;
+background:black;
+border:2px solid #333;
+border-radius:12px;
+object-fit:cover;
+"
+    ></video>
+
+    <!-- REMOTE -->
+
+    <video
+    id="remoteVideo2"
+    autoplay
+    
+    playsinline
+        style="
+width:240px;
+height:180px;
+background:black;
+border:2px solid #333;
+border-radius:12px;
+display:block;
+object-fit:cover;
+"
+    ></video>
+
+</div>
+
+<script>
+
+const localVideo =
+    document.getElementById(
+        "localVideo"
+    );
+
+const remoteVideo =
+    document.getElementById(
+        "remoteVideo2"
+    );
+
+let localStream;
+let peer;
+
+// ===== START CAMERA =====
+
+async function startMedia(){
+
+    localStream =
+        await navigator.mediaDevices
+        .getUserMedia({
+            video:true,
+            audio:true
+        });
+
+    localVideo.srcObject =
+        localStream;
+
+    console.log(
+        "LOCAL CAMERA OK"
+    );
+}
+
+// ===== CREATE PEER =====
+
+function createPeer(){
+
+    peer = new RTCPeerConnection({
+
+        iceServers:[
+            {
+                urls:
+                "stun:stun.l.google.com:19302"
+            }
+        ]
+    });
+
+    // SEND TRACKS
+
+    localStream
+        .getTracks()
+        .forEach(track => {
+
+            peer.addTrack(
+                track,
+                localStream
+            );
+        });
+
+    // RECEIVE REMOTE
+
+let remoteLoaded = false;
+
+const remoteStream =
+    new MediaStream();
+
+remoteVideo.srcObject =
+    remoteStream;
+
+remoteVideo.onloadeddata =
+    async () => {
+
+        console.log(
+            "REMOTE DATA READY"
+        );
+
+        try{
+
+            remoteVideo.muted = false;
+
+            await remoteVideo.play();
+
+            console.log(
+                "REMOTE VIDEO PLAYING"
+            );
+
+        }catch(err){
+
+            console.log(
+                "REMOTE PLAY FAIL",
+                err
+            );
+        }
+    };
+
+peer.ontrack = event => {
+
+    console.log(
+        "TRACK RECEIVED:",
+        event.track.kind
+    );
+
+    remoteStream.addTrack(
+        event.track
+    );
+
+    console.log(
+        "TRACK ADDED"
+    );
+};
+
+    // ICE
+
+    peer.onicecandidate = event => {
+
+        if(event.candidate){
+
+            socket.emit(
+                "iceCandidate",
+                {
+                    roomId: myRoom,
+                    candidate: event.candidate
+                }
+            );
+        }
+    };
+}
+
+// ===== HOST =====
+
+socket.on(
+    "peerJoined",
+    async () => {
+
+        if(!isAdmin || !gameStarted) return;
+
+        console.log(
+            "HOST START"
+        );
+
+        await startMedia();
+
+        createPeer();
+
+        const offer =
+            await peer.createOffer();
+
+        await peer
+            .setLocalDescription(
+                offer
+            );
+
+        socket.emit(
+            "offer",
+            {
+                roomId: myRoom,
+                offer
+            }
+        );
+    }
+);
+
+// ===== RECEIVE OFFER =====
+
+socket.on(
+    "offer",
+    async data => {
+
+        console.log(
+            "OFFER RECEIVED"
+        );
+
+        await startMedia();
+
+        createPeer();
+
+        await peer
+            .setRemoteDescription(
+                new RTCSessionDescription(
+                    data.offer
+                )
+            );
+
+        const answer =
+            await peer
+            .createAnswer();
+
+        await peer
+            .setLocalDescription(
+                answer
+            );
+
+        socket.emit(
+            "answer",
+            {
+                roomId: myRoom,
+                answer
+            }
+        );
+    }
+);
+
+// ===== RECEIVE ANSWER =====
+
+socket.on(
+    "answer",
+    async data => {
+
+        console.log(
+            "ANSWER RECEIVED"
+        );
+
+        await peer
+            .setRemoteDescription(
+                new RTCSessionDescription(
+                    data.answer
+                )
+            );
+    }
+);
+
+// ===== ICE =====
+
+socket.on(
+    "iceCandidate",
+    async data => {
+
+        try{
+
+            if(peer){
+
+                await peer
+                    .addIceCandidate(
+                        new RTCIceCandidate(
+                            data.candidate
+                        )
+                    );
+            }
+
+        }catch(err){
+
+            console.log(
+                "ICE ERROR",
+                err
+            );
+        }
+    }
+);
+
+</script>
+<script>
+
+async function enablePush(){
+
+    const permission =
+        await Notification.requestPermission();
+
+    console.log(
+        "NOTIFICATION:",
+        permission
+    );
+
+    if(permission !== "granted"){
+
+        alert("BRAK ZGODY NA POWIADOMIENIA");
+
+        return;
+    }
+
+    const reg =
+        await navigator.serviceWorker.register(
+            "/sw.js"
+        );
+
+    console.log("SW READY");
+
+    const sub =
+        await reg.pushManager.subscribe({
+
+            userVisibleOnly:true,
+
+            applicationServerKey:
+urlBase64ToUint8Array(
+"BF1w57nfnavC6YNUxS4hUWAxZmH-vvOa3C7NLbXNescG1c9tWuIO3Oj9vMvzVftW7DFyDVVyXmFDc9GQNuoy5KM"
+)
+
+        });
+
+    console.log("PUSH OK");
+
+    socket.emit(
+        "pushSub",
+        sub
+    );
+}
+function urlBase64ToUint8Array(base64String) {
+
+    const padding =
+        '='.repeat((4 - base64String.length % 4) % 4);
+
+    const base64 =
+        (base64String + padding)
+        .replace(/\-/g, '+')
+        .replace(/_/g, '/');
+
+    const rawData =
+        window.atob(base64);
+
+    const outputArray =
+        new Uint8Array(rawData.length);
+
+    for (let i = 0; i < rawData.length; ++i) {
+
+        outputArray[i] =
+            rawData.charCodeAt(i);
+    }
+
+    return outputArray;
+}
+enablePush();
+
+</script>
+</body>
+</html>
