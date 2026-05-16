@@ -510,6 +510,7 @@ border-radius:12px;
 
 let localStream = null;
 let peerConnection = null;
+let pendingCandidates = [];
 
 const localVideo =
     document.getElementById("localVideo");
@@ -624,6 +625,20 @@ socket.on("offer", async data => {
 
     await createPeer();
 
+    // ===== DODAJ OCZEKUJĄCE ICE =====
+
+    for(const c of pendingCandidates){
+
+        await peerConnection
+            .addIceCandidate(
+                new RTCIceCandidate(c)
+            );
+    }
+
+    pendingCandidates = [];
+
+    // ===== REMOTE DESCRIPTION =====
+
     await peerConnection
         .setRemoteDescription(
             new RTCSessionDescription(
@@ -667,6 +682,19 @@ socket.on("iceCandidate", async data => {
 
     try{
 
+        // ===== PEER JESZCZE NIE GOTOWY =====
+
+        if(!peerConnection){
+
+            pendingCandidates.push(
+                data.candidate
+            );
+
+            return;
+        }
+
+        // ===== NORMAL ICE =====
+
         await peerConnection
             .addIceCandidate(
                 new RTCIceCandidate(
@@ -682,7 +710,6 @@ socket.on("iceCandidate", async data => {
         );
     }
 });
-
 </script>
 </body>
 </html>
