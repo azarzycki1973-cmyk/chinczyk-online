@@ -561,35 +561,34 @@ function createPeer(){
 
     // RECEIVE REMOTE
 
-peer.ontrack = async event => {
+let remoteLoaded = false;
+
+peer.ontrack = event => {
 
     console.log(
-        "REMOTE STREAM OK",
-        event.streams[0]
+        "REMOTE STREAM OK"
     );
 
-    // JUŻ USTAWIONE → NIE RESETUJ
+    if(remoteLoaded) return;
 
-    if(remoteVideo.srcObject) return;
+    remoteLoaded = true;
+
+    const remoteStream =
+        new MediaStream();
+
+    event.streams[0]
+        .getTracks()
+        .forEach(track => {
+
+            remoteStream.addTrack(track);
+        });
 
     remoteVideo.srcObject =
-        event.streams[0];
+        remoteStream;
 
-    try{
-
-        await remoteVideo.play();
-
-        console.log(
-            "REMOTE PLAY OK"
-        );
-
-    }catch(err){
-
-        console.log(
-            "REMOTE PLAY ERROR",
-            err
-        );
-    }
+    console.log(
+        "REMOTE VIDEO SET"
+    );
 };
 
     // ICE
