@@ -427,6 +427,23 @@ async function startOnlineGame(){
 
     await startMedia();
 
+    createPeer();
+
+    const offer =
+        await peer.createOffer();
+
+    await peer.setLocalDescription(
+        offer
+    );
+
+    socket.emit(
+        "offer",
+        {
+            roomId: myRoom,
+            offer
+        }
+    );
+
     socket.emit(
         "startGame",
         myRoom
