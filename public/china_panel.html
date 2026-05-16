@@ -495,6 +495,8 @@ padding:10px;
 border-radius:12px;
 ">
 
+    <!-- LOCAL -->
+
     <video
         id="localVideo"
         autoplay
@@ -509,93 +511,98 @@ border-radius:12px;
         "
     ></video>
 
-<video
-    id="remoteVideo"
-    autoplay
-    muted
-    playsinline
-    style="
-    width:180px;
-    height:120px;
-    background:black;
-    border-radius:10px;
-    object-fit:cover;
-    "
-></video>
+    <!-- REMOTE -->
+
+    <video
+        id="remoteVideo"
+        autoplay
+        playsinline
+        style="
+        width:180px;
+        height:120px;
+        background:black;
+        border-radius:10px;
+        object-fit:cover;
+        "
+    ></video>
 
 </div>
 
 <script>
 
-let localStream = null;
-let peerConnection = null;
-let pendingCandidates = [];
-
 const localVideo =
-    document.getElementById("localVideo");
+    document.getElementById(
+        "localVideo"
+    );
 
 const remoteVideo =
-    document.getElementById("remoteVideo");
+    document.getElementById(
+        "remoteVideo"
+    );
 
-const rtcConfig = {
-    iceServers: [
-        {
-            urls: "stun:stun.l.google.com:19302"
-        }
-    ]
-};
+let localStream;
+let peer;
+
+// ===== START CAMERA =====
 
 async function startMedia(){
 
-    try{
+    localStream =
+        await navigator.mediaDevices
+        .getUserMedia({
+            video:true,
+            audio:true
+        });
 
-        localStream =
-            await navigator.mediaDevices
-            .getUserMedia({
-                video:true,
-                audio:true
-            });
+    localVideo.srcObject =
+        localStream;
 
-localVideo.srcObject = localStream;
-
-
-
-console.log(
-    "LOCAL VIDEO OK"
-);
-        console.log("MEDIA OK");
-
-    }catch(err){
-
-        console.log(
-            "MEDIA ERROR:",
-            err
-        );
-    }
+    console.log(
+        "LOCAL CAMERA OK"
+    );
 }
 
-async function createPeer(){
+// ===== CREATE PEER =====
 
-    peerConnection =
-        new RTCPeerConnection(rtcConfig);
+function createPeer(){
+
+    peer = new RTCPeerConnection({
+
+        iceServers:[
+            {
+                urls:
+                "stun:stun.l.google.com:19302"
+            }
+        ]
+    });
+
+    // SEND TRACKS
 
     localStream
         .getTracks()
         .forEach(track => {
 
-            peerConnection.addTrack(
+            peer.addTrack(
                 track,
                 localStream
             );
         });
 
-    peerConnection.ontrack = event => {
+    // RECEIVE REMOTE
+
+    peer.ontrack = event => {
+
+        console.log(
+            "REMOTE STREAM OK"
+        );
 
         remoteVideo.srcObject =
             event.streams[0];
     };
 
-    peerConnection.onicecandidate = event => {
+    // ICE
+
+    peer.onicecandidate = event => {
 
         if(event.candidate){
 
@@ -610,105 +617,128 @@ async function createPeer(){
     };
 }
 
-// ===== HOST START =====
+// ===== HOST =====
 
+socket.on(
+    "peerJoined",
+    async () => {
 
+        if(!isAdmin) return;
+
+        console.log(
+            "HOST START"
+        );
+
+        await startMedia();
+
+        createPeer();
+
+        const offer =
+            await peer.createOffer();
+
+        await peer
+            .setLocalDescription(
+                offer
+            );
+
+        socket.emit(
+            "offer",
+            {
+                roomId: myRoom,
+                offer
+            }
+        );
+    }
+);
 
 // ===== RECEIVE OFFER =====
 
-socket.on("offer", async data => {
+socket.on(
+    "offer",
+    async data => {
 
-    console.log("OFFER RECEIVED");
-
-    await startMedia();
-
-    await createPeer();
-
-    // ===== DODAJ OCZEKUJĄCE ICE =====
-
-    for(const c of pendingCandidates){
-
-        await peerConnection
-            .addIceCandidate(
-                new RTCIceCandidate(c)
-            );
-    }
-
-    pendingCandidates = [];
-
-    // ===== REMOTE DESCRIPTION =====
-
-    await peerConnection
-        .setRemoteDescription(
-            new RTCSessionDescription(
-                data.offer
-            )
+        console.log(
+            "OFFER RECEIVED"
         );
 
-    const answer =
-        await peerConnection
-        .createAnswer();
+        await startMedia();
 
-    await peerConnection
-        .setLocalDescription(answer);
+        createPeer();
 
-    socket.emit(
-        "answer",
-        {
-            roomId: myRoom,
-            answer
-        }
-    );
-});
-
-// ===== RECEIVE ANSWER =====
-
-socket.on("answer", async data => {
-
-    console.log("ANSWER RECEIVED");
-
-    await peerConnection
-        .setRemoteDescription(
-            new RTCSessionDescription(
-                data.answer
-            )
-        );
-});
-
-// ===== ICE =====
-
-socket.on("iceCandidate", async data => {
-
-    try{
-
-        // ===== PEER JESZCZE NIE GOTOWY =====
-
-        if(!peerConnection){
-
-            pendingCandidates.push(
-                data.candidate
-            );
-
-            return;
-        }
-
-        // ===== NORMAL ICE =====
-
-        await peerConnection
-            .addIceCandidate(
-                new RTCIceCandidate(
-                    data.candidate
+        await peer
+            .setRemoteDescription(
+                new RTCSessionDescription(
+                    data.offer
                 )
             );
 
-    }catch(err){
+        const answer =
+            await peer
+            .createAnswer();
 
-        console.log(
-            "ICE ERROR:",
-            err
+        await peer
+            .setLocalDescription(
+                answer
+            );
+
+        socket.emit(
+            "answer",
+            {
+                roomId: myRoom,
+                answer
+            }
         );
     }
-});
+);
+
+// ===== RECEIVE ANSWER =====
+
+socket.on(
+    "answer",
+    async data => {
+
+        console.log(
+            "ANSWER RECEIVED"
+        );
+
+        await peer
+            .setRemoteDescription(
+                new RTCSessionDescription(
+                    data.answer
+                )
+            );
+    }
+);
+
+// ===== ICE =====
+
+socket.on(
+    "iceCandidate",
+    async data => {
+
+        try{
+
+            if(peer){
+
+                await peer
+                    .addIceCandidate(
+                        new RTCIceCandidate(
+                            data.candidate
+                        )
+                    );
+            }
+
+        }catch(err){
+
+            console.log(
+                "ICE ERROR",
+                err
+            );
+        }
+    }
+);
+
 </script>
+
 </body>
 </html>
